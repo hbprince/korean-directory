@@ -1,6 +1,6 @@
 /**
  * Environment variable validation
- * This runs on server-side only to validate required env vars
+ * This runs on server-side only to validate required env vars at RUNTIME (not build time)
  */
 
 export function validateEnv() {
@@ -9,15 +9,23 @@ export function validateEnv() {
     return;
   }
 
+  // Skip validation during build time (next build)
+  // Build time: NEXT_PHASE is set to 'phase-production-build'
+  if (process.env.NEXT_PHASE === 'phase-production-build') {
+    return;
+  }
+
   const requiredVars = ['DATABASE_URL'];
 
   const missing = requiredVars.filter((key) => !process.env[key]);
 
   if (missing.length > 0) {
-    throw new Error(
-      `Missing required environment variables: ${missing.join(', ')}.\n` +
+    console.error(
+      `[env] Missing required environment variables: ${missing.join(', ')}.\n` +
       `Set them in Vercel env vars (for production) and .env.local (for local development).`
     );
+    // Don't throw during SSR/ISR - just log the error
+    // The actual DB connection will fail with a clearer error
   }
 
   // Warn about deprecated vars
@@ -32,7 +40,7 @@ export function validateEnv() {
   }
 }
 
-// Auto-validate on import (server-side only)
-if (typeof window === 'undefined') {
+// Auto-validate on import (server-side only, runtime only)
+if (typeof window === 'undefined' && process.env.NEXT_PHASE !== 'phase-production-build') {
   validateEnv();
 }

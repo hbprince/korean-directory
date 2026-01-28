@@ -1,5 +1,7 @@
 import { PrismaClient } from '@prisma/client';
-import '@/lib/env'; // Validate env vars on import
+
+// Note: Env validation is done via scripts/db-check.ts
+// Don't import env.ts here as it can cause build issues
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
