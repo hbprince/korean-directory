@@ -11,6 +11,7 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
+    "db:check": "npx tsx scripts/db-check.ts",
     "ingest": "npx tsx scripts/ingest.ts",
     "seed:enrich": "npx tsx scripts/seed-enrichment.ts",
     "audit:bilingual": "npx tsx scripts/audit-bilingual.ts",
