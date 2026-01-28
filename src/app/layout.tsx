@@ -46,8 +46,8 @@ function Header() {
   return (
     <header className="border-b border-gray-200 bg-white">
       <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        <Link href="/" className="text-xl font-bold text-gray-900">
-          KBiz <span className="text-blue-600">Directory</span>
+        <Link href="/" className="text-2xl font-bold text-gray-900">
+          한인맵
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm">
           <Link href="/ca/los-angeles/medical" className="text-gray-600 hover:text-gray-900">
@@ -74,7 +74,7 @@ function Footer() {
       <div className="max-w-6xl mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-8">
           <div>
-            <h3 className="font-semibold text-gray-900 mb-3">Korean Business Directory</h3>
+            <h3 className="font-semibold text-gray-900 mb-3">한인맵</h3>
             <p className="text-sm text-gray-600">
               Find Korean-speaking professionals and businesses in your area.
             </p>
@@ -105,7 +105,7 @@ function Footer() {
           </div>
         </div>
         <div className="mt-8 pt-8 border-t border-gray-200 text-center text-sm text-gray-500">
-          © {new Date().getFullYear()} Korean Business Directory. All rights reserved.
+          © {new Date().getFullYear()} 한인맵. All rights reserved.
         </div>
       </div>
     </footer>
