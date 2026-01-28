@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import prisma from '@/lib/db/prisma';
 import { FAQSection, generateBusinessFAQs } from '@/components/FAQSection';
+import { BusinessCTA } from '@/components/BusinessCTA';
 import {
   generateL3Metadata,
   generateLocalBusinessSchema,
@@ -210,26 +211,15 @@ export default async function BusinessPage({ params }: PageProps) {
         ) : null}
 
         {/* Call to Action */}
-        <div className="flex gap-4 mb-8">
-          {(business.phoneRaw || business.phoneE164) && (
-            <a
-              href={`tel:${business.phoneE164 || business.phoneRaw}`}
-              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              📞 {UI_LABELS.call.ko} ({UI_LABELS.call.en})
-            </a>
-          )}
-          <a
-            href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-              business.addressRaw
-            )}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center px-6 py-3 bg-white border border-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            🚗 {UI_LABELS.directions.ko} ({UI_LABELS.directions.en})
-          </a>
-        </div>
+        <BusinessCTA
+          businessId={business.id}
+          businessName={business.nameEn || business.nameKo}
+          phone={business.phoneRaw}
+          phoneE164={business.phoneE164}
+          address={business.addressRaw}
+          city={business.city}
+          category={business.primaryCategory.nameEn}
+        />
 
         <FAQSection faqs={faqs} />
 

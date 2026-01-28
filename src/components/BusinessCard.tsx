@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { formatBilingual, UI_LABELS } from '@/lib/i18n/labels';
+import { trackCallClick } from '@/lib/analytics/ga';
 
 export interface BusinessCardProps {
   id: number;
@@ -20,17 +21,30 @@ export interface BusinessCardProps {
 }
 
 export function BusinessCard({
+  id,
   nameKo,
   nameEn,
   addressRaw,
+  city,
   phoneRaw,
   phoneE164,
   slug,
   rating,
   reviewCount,
+  categoryNameEn,
 }: BusinessCardProps) {
   // Korean name as primary, English as secondary
   const displayName = formatBilingual(nameKo, nameEn);
+
+  const handleCallClick = () => {
+    trackCallClick({
+      phone: phoneE164 || phoneRaw || undefined,
+      businessId: id,
+      businessName: nameEn || nameKo,
+      city,
+      category: categoryNameEn,
+    });
+  };
 
   return (
     <article className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
@@ -57,7 +71,10 @@ export function BusinessCard({
           <a
             href={`tel:${phoneE164 || phoneRaw}`}
             className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCallClick();
+            }}
           >
             📞 {UI_LABELS.call.ko} ({UI_LABELS.call.en})
           </a>
