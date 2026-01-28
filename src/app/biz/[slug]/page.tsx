@@ -7,6 +7,7 @@ import {
   generateL3Metadata,
   generateLocalBusinessSchema,
 } from '@/lib/seo/meta';
+import { formatBilingual, UI_LABELS } from '@/lib/i18n/labels';
 
 interface PageProps {
   params: Promise<{
@@ -52,8 +53,8 @@ export default async function BusinessPage({ params }: PageProps) {
 
   if (!business) notFound();
 
-  const displayName = business.nameEn || business.nameKo;
-  const koreanName = business.nameEn ? business.nameKo : null;
+  // Korean name primary, English secondary
+  const displayName = formatBilingual(business.nameKo, business.nameEn);
   const cityDisplay = toTitleCase(business.city);
   const googlePlace = business.googlePlace;
 
@@ -110,9 +111,6 @@ export default async function BusinessPage({ params }: PageProps) {
         {/* Business Header */}
         <header className="border-b border-gray-200 pb-6 mb-6">
           <h1 className="text-2xl font-bold text-gray-900">{displayName}</h1>
-          {koreanName && (
-            <p className="text-lg text-gray-600 mt-1">{koreanName}</p>
-          )}
 
           <div className="flex flex-wrap items-center gap-4 mt-4">
             <span className="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full">
@@ -138,16 +136,16 @@ export default async function BusinessPage({ params }: PageProps) {
         {/* Contact Information */}
         <section className="grid md:grid-cols-2 gap-8 mb-8">
           <div>
-            <h2 className="text-lg font-semibold mb-4">Contact Information</h2>
+            <h2 className="text-lg font-semibold mb-4">연락처 (Contact)</h2>
             <dl className="space-y-3">
               <div>
-                <dt className="text-sm text-gray-500">Address</dt>
+                <dt className="text-sm text-gray-500">{UI_LABELS.address.ko} ({UI_LABELS.address.en})</dt>
                 <dd className="text-gray-900">{business.addressRaw}</dd>
               </div>
 
               {(business.phoneRaw || business.phoneE164) && (
                 <div>
-                  <dt className="text-sm text-gray-500">Phone</dt>
+                  <dt className="text-sm text-gray-500">{UI_LABELS.phone.ko} ({UI_LABELS.phone.en})</dt>
                   <dd>
                     <a
                       href={`tel:${business.phoneE164 || business.phoneRaw}`}
@@ -161,7 +159,7 @@ export default async function BusinessPage({ params }: PageProps) {
 
               {googlePlace?.website && (
                 <div>
-                  <dt className="text-sm text-gray-500">Website</dt>
+                  <dt className="text-sm text-gray-500">{UI_LABELS.website.ko} ({UI_LABELS.website.en})</dt>
                   <dd>
                     <a
                       href={googlePlace.website}
@@ -180,7 +178,7 @@ export default async function BusinessPage({ params }: PageProps) {
           {/* Hours */}
           {googlePlace?.openingHoursText && (
             <div>
-              <h2 className="text-lg font-semibold mb-4">Business Hours</h2>
+              <h2 className="text-lg font-semibold mb-4">{UI_LABELS.hours.ko} ({UI_LABELS.hours.en})</h2>
               <ul className="space-y-1 text-sm">
                 {(googlePlace.openingHoursText as string[]).map((line, idx) => (
                   <li key={idx} className="text-gray-700">
@@ -218,7 +216,7 @@ export default async function BusinessPage({ params }: PageProps) {
               href={`tel:${business.phoneE164 || business.phoneRaw}`}
               className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
             >
-              📞 Call Now
+              📞 {UI_LABELS.call.ko} ({UI_LABELS.call.en})
             </a>
           )}
           <a
@@ -229,7 +227,7 @@ export default async function BusinessPage({ params }: PageProps) {
             rel="noopener noreferrer"
             className="inline-flex items-center px-6 py-3 bg-white border border-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
           >
-            🚗 Get Directions
+            🚗 {UI_LABELS.directions.ko} ({UI_LABELS.directions.en})
           </a>
         </div>
 

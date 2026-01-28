@@ -11,9 +11,10 @@ import {
   isSubcategory,
 } from '@/lib/taxonomy/categories';
 import { generateL1Metadata, generateL2Metadata, generateItemListSchema } from '@/lib/seo/meta';
+import { getCityNameKo, UI_LABELS } from '@/lib/i18n/labels';
 
 const ITEMS_PER_PAGE = 20;
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com';
+const BASE_URL = 'https://www.haninmap.com';
 
 interface PageProps {
   params: Promise<{
@@ -54,6 +55,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       categoryNameEn: categoryInfo.nameEn,
       categoryNameKo: categoryInfo.nameKo,
       count,
+      categorySlug: categoryInfo.slug,
     });
   } else {
     return generateL2Metadata({
@@ -63,6 +65,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       subcategoryNameKo: categoryInfo.nameKo,
       primaryCategoryNameEn: categoryInfo.parentNameEn || categoryInfo.nameEn,
       count,
+      subcategorySlug: categoryInfo.slug,
     });
   }
 }
@@ -146,22 +149,24 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
     take: ITEMS_PER_PAGE,
   });
 
-  // Generate page title
+  // Generate page title (English primary for H1)
   const cityDisplay = toTitleCase(city);
+  const cityKo = getCityNameKo(city);
   const stateDisplay = stateNormalized;
-  const pageTitle =
-    categoryInfo.level === 'primary'
-      ? `Korean ${categoryInfo.nameEn} in ${cityDisplay}, ${stateDisplay}`
-      : `Korean ${categoryInfo.nameEn} in ${cityDisplay}, ${stateDisplay}`;
+  // H1: English primary
+  const h1Title = `Korean ${categoryInfo.nameEn} in ${cityDisplay}, ${stateDisplay}`;
+  // H2/subtitle: Korean with context
+  const koreanSubtitle = `${cityKo} 한인 ${categoryInfo.nameKo} (한국어 상담 가능)`;
 
-  // Generate FAQs
-  const faqs = generateCategoryFAQs({
+  // Only generate FAQs if there are results
+  const faqs = totalCount > 0 ? generateCategoryFAQs({
     categoryNameEn: categoryInfo.nameEn,
     categoryNameKo: categoryInfo.nameKo,
     city: cityDisplay,
+    cityKo: cityKo,
     state: stateDisplay,
     count: totalCount,
-  });
+  }) : [];
 
   // Generate JSON-LD
   const jsonLd = generateItemListSchema(
@@ -191,16 +196,19 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
         />
 
         <header className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">{pageTitle}</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{h1Title}</h1>
+          <h2 className="text-lg text-gray-700 mt-1">{koreanSubtitle}</h2>
           <p className="text-gray-600 mt-2">
-            {categoryInfo.nameKo} | {totalCount} businesses found
+            {totalCount} {UI_LABELS.businessesFound.ko} ({totalCount} {UI_LABELS.businessesFound.en})
           </p>
         </header>
 
         {businesses.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500">No businesses found in this category.</p>
-            <p className="text-gray-400 mt-2">Try a different category or city.</p>
+          <div className="text-center py-12 bg-gray-50 rounded-lg">
+            <p className="text-gray-600 text-lg">{UI_LABELS.noListingsYet.ko}</p>
+            <p className="text-gray-500 mt-1">{UI_LABELS.noListingsYet.en}</p>
+            <p className="text-gray-400 mt-4">{UI_LABELS.trySearching.ko}</p>
+            <p className="text-gray-400">{UI_LABELS.trySearching.en}</p>
           </div>
         ) : (
           <>
@@ -233,7 +241,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
           </>
         )}
 
-        <FAQSection faqs={faqs} />
+        {faqs.length > 0 && <FAQSection faqs={faqs} />}
 
         {/* Internal links to subcategories */}
         {categoryInfo.level === 'primary' && (
@@ -262,7 +270,7 @@ async function SubcategoryLinks({
   return (
     <section className="mt-12 border-t border-gray-200 pt-8">
       <h2 className="text-lg font-semibold mb-4">
-        Browse {primary.nameEn} Specialists
+        {primary.nameKo} 전문 분야 (Browse {primary.nameEn} Specialists)
       </h2>
       <div className="flex flex-wrap gap-2">
         {primary.subcategories.map((sub) => (
@@ -271,7 +279,7 @@ async function SubcategoryLinks({
             href={`/${state}/${city}/${sub.slug}`}
             className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors"
           >
-            {sub.nameEn}
+            {sub.nameKo} | {sub.nameEn}
           </a>
         ))}
       </div>
@@ -310,17 +318,22 @@ async function NearbyCities({
 
   return (
     <section className="mt-8 border-t border-gray-200 pt-8">
-      <h2 className="text-lg font-semibold mb-4">Nearby Cities</h2>
+      <h2 className="text-lg font-semibold mb-4">주변 도시 (Nearby Cities)</h2>
       <div className="flex flex-wrap gap-2">
-        {cities.map((c) => (
-          <a
-            key={c.city}
-            href={`/${state}/${c.city.toLowerCase().replace(/\s+/g, '-')}/${category}`}
-            className="px-3 py-1.5 text-sm bg-gray-50 text-gray-600 rounded hover:bg-gray-100 transition-colors"
-          >
-            {toTitleCase(c.city)} ({c._count})
-          </a>
-        ))}
+        {cities.map((c) => {
+          const citySlug = c.city.toLowerCase().replace(/\s+/g, '-');
+          const cityKo = getCityNameKo(citySlug);
+          const cityEn = toTitleCase(c.city);
+          return (
+            <a
+              key={c.city}
+              href={`/${state}/${citySlug}/${category}`}
+              className="px-3 py-1.5 text-sm bg-gray-50 text-gray-600 rounded hover:bg-gray-100 transition-colors"
+            >
+              {cityKo !== cityEn ? `${cityKo} (${cityEn})` : cityEn} ({c._count})
+            </a>
+          );
+        })}
       </div>
     </section>
   );

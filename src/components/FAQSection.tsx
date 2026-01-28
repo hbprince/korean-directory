@@ -1,3 +1,5 @@
+import { UI_LABELS } from '@/lib/i18n/labels';
+
 interface FAQItem {
   question: string;
   answer: string;
@@ -12,7 +14,9 @@ export function FAQSection({ faqs }: FAQSectionProps) {
 
   return (
     <section className="mt-12 border-t border-gray-200 pt-8">
-      <h2 className="text-xl font-semibold mb-6">Frequently Asked Questions</h2>
+      <h2 className="text-xl font-semibold mb-6">
+        {UI_LABELS.frequentlyAskedQuestions.ko} ({UI_LABELS.frequentlyAskedQuestions.en})
+      </h2>
       <dl className="space-y-6">
         {faqs.map((faq, idx) => (
           <div key={idx}>
@@ -26,35 +30,36 @@ export function FAQSection({ faqs }: FAQSectionProps) {
 }
 
 /**
- * Generate category-specific FAQs
+ * Generate category-specific FAQs (bilingual)
  */
 export function generateCategoryFAQs(params: {
   categoryNameEn: string;
   categoryNameKo: string;
   city: string;
+  cityKo: string;
   state: string;
   count: number;
 }): FAQItem[] {
-  const { categoryNameEn, categoryNameKo, city, state, count } = params;
+  const { categoryNameEn, categoryNameKo, city, cityKo, state, count } = params;
   const cityDisplay = toTitleCase(city);
   const stateDisplay = state.toUpperCase();
 
   return [
     {
-      question: `How many Korean ${categoryNameEn.toLowerCase()} are in ${cityDisplay}?`,
-      answer: `There are ${count} Korean-speaking ${categoryNameEn.toLowerCase()} businesses listed in ${cityDisplay}, ${stateDisplay}. Our directory is updated regularly to include new listings.`,
+      question: `${cityKo}에 한인 ${categoryNameKo}가 몇 곳 있나요? (How many Korean ${categoryNameEn.toLowerCase()} are in ${cityDisplay}?)`,
+      answer: `${cityKo}(${cityDisplay}, ${stateDisplay})에 ${count}곳의 한인 ${categoryNameKo}(${categoryNameEn.toLowerCase()})가 등록되어 있습니다. There are ${count} Korean-speaking ${categoryNameEn.toLowerCase()} businesses listed.`,
     },
     {
-      question: `Do these ${categoryNameEn.toLowerCase()} speak Korean?`,
-      answer: `Yes, all ${categoryNameEn.toLowerCase()} (${categoryNameKo}) listed in our directory serve the Korean-speaking community. Many staff members are fluent in Korean.`,
+      question: `한국어 상담이 가능한가요? (Do they speak Korean?)`,
+      answer: `네, 이 디렉토리에 등록된 모든 ${categoryNameKo}(${categoryNameEn.toLowerCase()})는 한인 커뮤니티를 위한 서비스를 제공합니다. Yes, all listings serve the Korean-speaking community.`,
     },
     {
-      question: `How do I contact a ${categoryNameEn.toLowerCase()} from this list?`,
-      answer: `Click on any listing to see their full contact information including phone number and address. You can call directly by clicking the "Call" button on mobile devices.`,
+      question: `어떻게 연락할 수 있나요? (How do I contact them?)`,
+      answer: `각 업체를 클릭하면 전화번호와 주소를 확인할 수 있습니다. 모바일에서는 "전화" 버튼을 눌러 바로 통화할 수 있습니다. Click any listing to see contact info. On mobile, tap "Call" to dial directly.`,
     },
     {
-      question: `Are these listings verified?`,
-      answer: `Our listings are sourced from multiple Korean community directories and verified where possible with Google Places data. We display ratings and reviews when available.`,
+      question: `정보가 정확한가요? (Are these listings verified?)`,
+      answer: `여러 한인 커뮤니티 디렉토리에서 수집한 정보이며, Google Places 데이터로 검증합니다. 가능한 경우 평점과 리뷰를 표시합니다. Listings are sourced from Korean community directories and verified with Google Places data.`,
     },
   ];
 }

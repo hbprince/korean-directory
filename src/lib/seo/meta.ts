@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
+import { getCityNameKo } from '@/lib/i18n/labels';
 
-const SITE_NAME = 'Korean Business Directory';
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com';
+const SITE_NAME = '한인맵 HaninMap';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.haninmap.com';
 
 /**
  * Generate metadata for L1 (state/city/primary-category) pages
@@ -12,25 +13,39 @@ export function generateL1Metadata(params: {
   categoryNameEn: string;
   categoryNameKo: string;
   count: number;
+  categorySlug?: string;
 }): Metadata {
-  const { city, state, categoryNameEn, categoryNameKo, count } = params;
+  const { city, state, categoryNameEn, categoryNameKo, count, categorySlug } = params;
   const cityDisplay = toTitleCase(city.replace(/-/g, ' '));
+  const cityKo = getCityNameKo(city);
   const stateDisplay = state.toUpperCase();
 
-  const title = `Korean ${categoryNameEn} in ${cityDisplay}, ${stateDisplay} | Find Korean-Speaking ${categoryNameEn}`;
-  const description = `Browse ${count} Korean-speaking ${categoryNameEn.toLowerCase()} in ${cityDisplay}. Verified listings with reviews, phone numbers, and directions. ${categoryNameKo} | ${SITE_NAME}`;
+  // English-first title with Korean
+  const title = `Korean ${categoryNameEn} in ${cityDisplay}, ${stateDisplay} | ${cityKo} ${categoryNameKo} (한국어)`;
+  const description = count > 0
+    ? `Browse ${count} Korean-speaking ${categoryNameEn.toLowerCase()} in ${cityDisplay}. ${cityKo} 한인 ${categoryNameKo} ${count}곳. 전화번호, 주소, 리뷰.`
+    : `Find Korean-speaking ${categoryNameEn.toLowerCase()} in ${cityDisplay}, ${stateDisplay}. ${cityKo} 한인 ${categoryNameKo}.`;
+
+  // noindex for 0-result pages
+  const robots = count === 0 ? 'noindex,follow' : 'index,follow';
+
+  // Use slug if provided, otherwise derive from name
+  const slug = categorySlug || categoryNameEn.toLowerCase().replace(/\s+/g, '-');
+  const canonicalUrl = `${BASE_URL}/${state.toLowerCase()}/${city.toLowerCase()}/${slug}`;
 
   return {
     title,
     description,
+    robots,
     openGraph: {
       title,
       description,
       type: 'website',
       siteName: SITE_NAME,
+      url: canonicalUrl,
     },
     alternates: {
-      canonical: `${BASE_URL}/${state}/${city}/${categoryNameEn.toLowerCase().replace(/\s+/g, '-')}`,
+      canonical: canonicalUrl,
     },
   };
 }
@@ -45,25 +60,39 @@ export function generateL2Metadata(params: {
   subcategoryNameKo: string;
   primaryCategoryNameEn: string;
   count: number;
+  subcategorySlug?: string;
 }): Metadata {
-  const { city, state, subcategoryNameEn, subcategoryNameKo, primaryCategoryNameEn, count } = params;
+  const { city, state, subcategoryNameEn, subcategoryNameKo, count, subcategorySlug } = params;
   const cityDisplay = toTitleCase(city.replace(/-/g, ' '));
+  const cityKo = getCityNameKo(city);
   const stateDisplay = state.toUpperCase();
 
-  const title = `Korean ${subcategoryNameEn} in ${cityDisplay}, ${stateDisplay} | ${primaryCategoryNameEn}`;
-  const description = `Find ${count} Korean-speaking ${subcategoryNameEn.toLowerCase()} specialists in ${cityDisplay}. Verified listings with reviews and contact info. ${subcategoryNameKo} | ${SITE_NAME}`;
+  // English-first title with Korean
+  const title = `Korean ${subcategoryNameEn} in ${cityDisplay}, ${stateDisplay} | ${cityKo} ${subcategoryNameKo} (한국어)`;
+  const description = count > 0
+    ? `Find ${count} Korean-speaking ${subcategoryNameEn.toLowerCase()} in ${cityDisplay}. ${cityKo} 한인 ${subcategoryNameKo} ${count}곳. 전화번호, 주소, 리뷰.`
+    : `Find Korean-speaking ${subcategoryNameEn.toLowerCase()} in ${cityDisplay}, ${stateDisplay}. ${cityKo} 한인 ${subcategoryNameKo}.`;
+
+  // noindex for 0-result pages
+  const robots = count === 0 ? 'noindex,follow' : 'index,follow';
+
+  // Use slug if provided, otherwise derive from name
+  const slug = subcategorySlug || subcategoryNameEn.toLowerCase().replace(/\s+/g, '-');
+  const canonicalUrl = `${BASE_URL}/${state.toLowerCase()}/${city.toLowerCase()}/${slug}`;
 
   return {
     title,
     description,
+    robots,
     openGraph: {
       title,
       description,
       type: 'website',
       siteName: SITE_NAME,
+      url: canonicalUrl,
     },
     alternates: {
-      canonical: `${BASE_URL}/${state}/${city}/${subcategoryNameEn.toLowerCase().replace(/\s+/g, '-')}`,
+      canonical: canonicalUrl,
     },
   };
 }

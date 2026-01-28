@@ -6,10 +6,22 @@ import { PRIMARY_CATEGORIES } from '@/lib/taxonomy/categories';
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
+const BASE_URL = 'https://www.haninmap.com';
+
 export const metadata: Metadata = {
-  title: 'Korean Business Directory | Find Korean-Speaking Businesses',
+  title: '한인맵 HaninMap | Korean Business Directory 한인 업소록',
   description:
-    'Find Korean-speaking doctors, dentists, lawyers, restaurants, and more. The most comprehensive directory of Korean businesses in the United States.',
+    '한인 병원, 치과, 변호사, 식당 찾기. Find Korean-speaking doctors, dentists, lawyers, restaurants and more. 미국 한인 업소 디렉토리.',
+  alternates: {
+    canonical: BASE_URL,
+  },
+  openGraph: {
+    title: '한인맵 HaninMap | Korean Business Directory',
+    description: '한인 병원, 치과, 변호사, 식당 찾기. Find Korean-speaking businesses in the United States.',
+    url: BASE_URL,
+    siteName: '한인맵 HaninMap',
+    type: 'website',
+  },
 };
 
 export default async function HomePage() {
@@ -28,18 +40,22 @@ export default async function HomePage() {
     <main className="max-w-6xl mx-auto px-4 py-8">
       {/* Hero Section */}
       <header className="text-center py-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-          Korean Business Directory
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+          한인맵 HaninMap
         </h1>
+        <h2 className="text-xl text-gray-700 mb-4">
+          Korean Business Directory | 한인 업소록
+        </h2>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Find Korean-speaking doctors, dentists, lawyers, restaurants, and more.
-          Browse {totalBusinesses.toLocaleString()} businesses across California.
+          한인 병원, 치과, 변호사, 식당 등 {totalBusinesses.toLocaleString()}개 업체 정보.
+          <br />
+          Find Korean-speaking doctors, dentists, lawyers, restaurants and more.
         </p>
       </header>
 
       {/* Quick Search by Category */}
       <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-6">Browse by Category</h2>
+        <h2 className="text-xl font-semibold mb-6">카테고리별 찾기 (Browse by Category)</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {PRIMARY_CATEGORIES.map((category) => (
             <CategoryCard
@@ -54,7 +70,7 @@ export default async function HomePage() {
 
       {/* Top Cities */}
       <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-6">Popular Cities</h2>
+        <h2 className="text-xl font-semibold mb-6">주요 도시 (Popular Cities)</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {topCities.map((loc) => (
             <CityCard
@@ -69,7 +85,7 @@ export default async function HomePage() {
 
       {/* Featured Categories by City */}
       <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-6">Popular Searches</h2>
+        <h2 className="text-xl font-semibold mb-6">인기 검색 (Popular Searches)</h2>
         <div className="flex flex-wrap gap-2">
           <QuickLink href="/ca/los-angeles/medical">Korean Doctors in Los Angeles</QuickLink>
           <QuickLink href="/ca/los-angeles/dental">Korean Dentists in Los Angeles</QuickLink>
@@ -84,12 +100,14 @@ export default async function HomePage() {
 
       {/* About Section */}
       <section className="bg-gray-50 rounded-lg p-6 mt-12">
-        <h2 className="text-lg font-semibold mb-4">About Korean Business Directory</h2>
+        <h2 className="text-lg font-semibold mb-4">한인맵 소개 (About HaninMap)</h2>
+        <p className="text-gray-600 text-sm leading-relaxed mb-3">
+          한인맵은 미국 내 한인 업소를 쉽게 찾을 수 있는 종합 디렉토리입니다.
+          한인 병원, 치과, 변호사, 식당 등 다양한 업종의 정보를 제공합니다.
+        </p>
         <p className="text-gray-600 text-sm leading-relaxed">
-          We are the most comprehensive directory of Korean-speaking businesses in the United States.
+          HaninMap is the most comprehensive directory of Korean-speaking businesses in the United States.
           Our listings include verified contact information, Google ratings, and business hours.
-          Whether you need a Korean-speaking doctor, dentist, lawyer, or any other professional service,
-          we help you find businesses that serve the Korean-speaking community.
         </p>
       </section>
     </main>

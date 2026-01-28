@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { formatBilingual, UI_LABELS } from '@/lib/i18n/labels';
 
 export interface BusinessCardProps {
   id: number;
@@ -28,8 +29,8 @@ export function BusinessCard({
   rating,
   reviewCount,
 }: BusinessCardProps) {
-  const displayName = nameEn || nameKo;
-  const koreanName = nameEn ? nameKo : null;
+  // Korean name as primary, English as secondary
+  const displayName = formatBilingual(nameKo, nameEn);
 
   return (
     <article className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
@@ -37,9 +38,6 @@ export function BusinessCard({
         <h2 className="text-lg font-semibold text-gray-900 hover:text-blue-600">
           {displayName}
         </h2>
-        {koreanName && (
-          <p className="text-sm text-gray-500 mt-0.5">{koreanName}</p>
-        )}
       </Link>
 
       <p className="text-sm text-gray-600 mt-2">{addressRaw}</p>
@@ -50,7 +48,7 @@ export function BusinessCard({
             <div className="flex items-center text-sm">
               <span className="text-yellow-500 mr-1">★</span>
               <span className="font-medium">{rating.toFixed(1)}</span>
-              <span className="text-gray-400 ml-1">({reviewCount})</span>
+              <span className="text-gray-400 ml-1">({reviewCount} {UI_LABELS.reviews.ko})</span>
             </div>
           )}
         </div>
@@ -61,7 +59,7 @@ export function BusinessCard({
             className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors"
             onClick={(e) => e.stopPropagation()}
           >
-            📞 Call
+            📞 {UI_LABELS.call.ko} ({UI_LABELS.call.en})
           </a>
         )}
       </div>

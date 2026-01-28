@@ -12,7 +12,9 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "ingest": "npx tsx scripts/ingest.ts",
-    "seed:enrich": "npx tsx scripts/seed-enrichment.ts"
+    "seed:enrich": "npx tsx scripts/seed-enrichment.ts",
+    "audit:bilingual": "npx tsx scripts/audit-bilingual.ts",
+    "audit:seo": "npx tsx scripts/seoFinalAudit.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

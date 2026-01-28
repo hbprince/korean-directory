@@ -1,21 +1,13 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db/prisma';
-import { PRIMARY_CATEGORIES } from '@/lib/taxonomy/categories';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com';
+const BASE_URL = 'https://www.haninmap.com';
 
 export async function GET() {
   try {
-    // Get all unique city/state combinations
-    const locations = await prisma.business.groupBy({
-      by: ['city', 'state'],
-      _count: true,
-      orderBy: { _count: { city: 'desc' } },
-    });
-
     // Build sitemap XML
     let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -29,28 +21,68 @@ export async function GET() {
   </url>
 `;
 
-    // L1 pages (state/city/primary-category)
-    for (const loc of locations) {
-      const citySlug = loc.city.toLowerCase().replace(/\s+/g, '-');
-      const stateSlug = loc.state.toLowerCase();
+    // Get all city/state/category combinations that have businesses (count > 0)
+    // L1: Primary categories
+    const primaryCategoryCounts = await prisma.business.groupBy({
+      by: ['city', 'state', 'primaryCategoryId'],
+      _count: true,
+    });
 
-      for (const category of PRIMARY_CATEGORIES) {
+    // Get category slugs
+    const categories = await prisma.category.findMany({
+      select: { id: true, slug: true, level: true },
+    });
+    const categoryMap = new Map(categories.map(c => [c.id, c]));
+
+    // Track unique URLs to avoid duplicates
+    const addedUrls = new Set<string>();
+
+    // L1 pages (primary categories with results)
+    for (const item of primaryCategoryCounts) {
+      const category = categoryMap.get(item.primaryCategoryId);
+      if (!category || category.level !== 'primary') continue;
+
+      const citySlug = item.city.toLowerCase().replace(/\s+/g, '-');
+      const stateSlug = item.state.toLowerCase();
+      const url = `${BASE_URL}/${stateSlug}/${citySlug}/${category.slug}`;
+
+      if (!addedUrls.has(url)) {
+        addedUrls.add(url);
         xml += `  <url>
-    <loc>${BASE_URL}/${stateSlug}/${citySlug}/${category.slug}</loc>
+    <loc>${url}</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 `;
+      }
+    }
 
-        // L2 pages (subcategories)
-        for (const sub of category.subcategories) {
-          xml += `  <url>
-    <loc>${BASE_URL}/${stateSlug}/${citySlug}/${sub.slug}</loc>
+    // L2: Subcategories with results
+    const subcategoryCounts = await prisma.business.groupBy({
+      by: ['city', 'state', 'subcategoryId'],
+      _count: true,
+      where: {
+        subcategoryId: { not: null },
+      },
+    });
+
+    for (const item of subcategoryCounts) {
+      if (!item.subcategoryId) continue;
+      const category = categoryMap.get(item.subcategoryId);
+      if (!category || category.level !== 'sub') continue;
+
+      const citySlug = item.city.toLowerCase().replace(/\s+/g, '-');
+      const stateSlug = item.state.toLowerCase();
+      const url = `${BASE_URL}/${stateSlug}/${citySlug}/${category.slug}`;
+
+      if (!addedUrls.has(url)) {
+        addedUrls.add(url);
+        xml += `  <url>
+    <loc>${url}</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
 `;
-        }
       }
     }
 
