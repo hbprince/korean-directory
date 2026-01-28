@@ -5,15 +5,6 @@
 
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db/prisma';
-import { mapRadioKoreaCategory } from '@/lib/taxonomy/categoryMapping';
-
-// V2 category data embedded - key categories only for the fix
-const V2_CATEGORY_FIXES: Record<string, string> = {
-  // Locksmith businesses - A16 in v2 = 열쇠/금고/락스미스
-  'A16': 'home-services',
-  // Travel - A15 in v2 = 여행사/관광
-  'A15': 'travel',
-};
 
 interface SourceKey {
   source: string;
