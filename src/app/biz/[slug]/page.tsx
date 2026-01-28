@@ -1,0 +1,315 @@
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import prisma from '@/lib/db/prisma';
+import { FAQSection, generateBusinessFAQs } from '@/components/FAQSection';
+import {
+  generateL3Metadata,
+  generateLocalBusinessSchema,
+} from '@/lib/seo/meta';
+
+interface PageProps {
+  params: Promise<{
+    slug: string;
+  }>;
+}
+
+async function getBusiness(slug: string) {
+  const business = await prisma.business.findUnique({
+    where: { slug },
+    include: {
+      primaryCategory: true,
+      subcategory: true,
+      googlePlace: true,
+    },
+  });
+
+  return business;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const business = await getBusiness(slug);
+
+  if (!business) return {};
+
+  return generateL3Metadata({
+    businessName: business.nameEn || business.nameKo,
+    city: business.city,
+    state: business.state,
+    categoryNameEn: business.primaryCategory.nameEn,
+    categoryNameKo: business.primaryCategory.nameKo,
+    slug: business.slug || '',
+    hasGooglePlace: !!business.googlePlace,
+    rating: business.googlePlace?.rating ?? undefined,
+    reviewCount: business.googlePlace?.userRatingsTotal ?? undefined,
+  });
+}
+
+export default async function BusinessPage({ params }: PageProps) {
+  const { slug } = await params;
+  const business = await getBusiness(slug);
+
+  if (!business) notFound();
+
+  const displayName = business.nameEn || business.nameKo;
+  const koreanName = business.nameEn ? business.nameKo : null;
+  const cityDisplay = toTitleCase(business.city);
+  const googlePlace = business.googlePlace;
+
+  // Generate JSON-LD
+  const jsonLd = generateLocalBusinessSchema({
+    name: displayName,
+    nameKo: business.nameKo,
+    address: business.addressRaw,
+    city: business.city,
+    state: business.state,
+    zip: business.zip,
+    phone: business.phoneE164 || business.phoneRaw,
+    lat: googlePlace?.lat || business.lat,
+    lng: googlePlace?.lng || business.lng,
+    categoryNameEn: business.primaryCategory.nameEn,
+    website: googlePlace?.website,
+    rating: googlePlace?.rating,
+    reviewCount: googlePlace?.userRatingsTotal,
+    slug: business.slug || '',
+  });
+
+  // Generate FAQs
+  const faqs = generateBusinessFAQs({
+    businessName: displayName,
+    categoryNameEn: business.primaryCategory.nameEn,
+    city: cityDisplay,
+    hasHours: !!(googlePlace?.openingHoursText as string[] | null)?.length,
+    hasRating: !!googlePlace?.rating,
+  });
+
+  const categoryPath = `/${business.state.toLowerCase()}/${business.city.toLowerCase().replace(/\s+/g, '-')}/${business.primaryCategory.slug}`;
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
+      <main className="max-w-4xl mx-auto px-4 py-8">
+        {/* Breadcrumb */}
+        <nav className="text-sm text-gray-500 mb-6">
+          <Link href="/" className="hover:text-gray-700">
+            Home
+          </Link>
+          <span className="mx-2">/</span>
+          <Link href={categoryPath} className="hover:text-gray-700">
+            {business.primaryCategory.nameEn} in {cityDisplay}
+          </Link>
+          <span className="mx-2">/</span>
+          <span className="text-gray-700">{displayName}</span>
+        </nav>
+
+        {/* Business Header */}
+        <header className="border-b border-gray-200 pb-6 mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">{displayName}</h1>
+          {koreanName && (
+            <p className="text-lg text-gray-600 mt-1">{koreanName}</p>
+          )}
+
+          <div className="flex flex-wrap items-center gap-4 mt-4">
+            <span className="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full">
+              {business.primaryCategory.nameEn}
+            </span>
+            {business.subcategory && (
+              <span className="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">
+                {business.subcategory.nameEn}
+              </span>
+            )}
+            {googlePlace?.rating && googlePlace.userRatingsTotal && (
+              <div className="flex items-center text-sm">
+                <span className="text-yellow-500 mr-1">★</span>
+                <span className="font-medium">{googlePlace.rating.toFixed(1)}</span>
+                <span className="text-gray-400 ml-1">
+                  ({googlePlace.userRatingsTotal} reviews)
+                </span>
+              </div>
+            )}
+          </div>
+        </header>
+
+        {/* Contact Information */}
+        <section className="grid md:grid-cols-2 gap-8 mb-8">
+          <div>
+            <h2 className="text-lg font-semibold mb-4">Contact Information</h2>
+            <dl className="space-y-3">
+              <div>
+                <dt className="text-sm text-gray-500">Address</dt>
+                <dd className="text-gray-900">{business.addressRaw}</dd>
+              </div>
+
+              {(business.phoneRaw || business.phoneE164) && (
+                <div>
+                  <dt className="text-sm text-gray-500">Phone</dt>
+                  <dd>
+                    <a
+                      href={`tel:${business.phoneE164 || business.phoneRaw}`}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      {business.phoneRaw || business.phoneE164}
+                    </a>
+                  </dd>
+                </div>
+              )}
+
+              {googlePlace?.website && (
+                <div>
+                  <dt className="text-sm text-gray-500">Website</dt>
+                  <dd>
+                    <a
+                      href={googlePlace.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      {new URL(googlePlace.website).hostname}
+                    </a>
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </div>
+
+          {/* Hours */}
+          {googlePlace?.openingHoursText && (
+            <div>
+              <h2 className="text-lg font-semibold mb-4">Business Hours</h2>
+              <ul className="space-y-1 text-sm">
+                {(googlePlace.openingHoursText as string[]).map((line, idx) => (
+                  <li key={idx} className="text-gray-700">
+                    {line}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </section>
+
+        {/* Map */}
+        {(googlePlace?.lat && googlePlace?.lng) || (business.lat && business.lng) ? (
+          <section className="mb-8">
+            <h2 className="text-lg font-semibold mb-4">Location</h2>
+            <div className="bg-gray-100 rounded-lg p-4 text-center">
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                  `${displayName} ${business.addressRaw}`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+              >
+                📍 View on Google Maps
+              </a>
+            </div>
+          </section>
+        ) : null}
+
+        {/* Call to Action */}
+        <div className="flex gap-4 mb-8">
+          {(business.phoneRaw || business.phoneE164) && (
+            <a
+              href={`tel:${business.phoneE164 || business.phoneRaw}`}
+              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              📞 Call Now
+            </a>
+          )}
+          <a
+            href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+              business.addressRaw
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center px-6 py-3 bg-white border border-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            🚗 Get Directions
+          </a>
+        </div>
+
+        <FAQSection faqs={faqs} />
+
+        {/* Related Businesses */}
+        <RelatedBusinesses
+          currentId={business.id}
+          categoryId={business.primaryCategoryId}
+          city={business.city}
+          state={business.state}
+        />
+      </main>
+    </>
+  );
+}
+
+async function RelatedBusinesses({
+  currentId,
+  categoryId,
+  city,
+  state,
+}: {
+  currentId: number;
+  categoryId: number;
+  city: string;
+  state: string;
+}) {
+  const related = await prisma.business.findMany({
+    where: {
+      id: { not: currentId },
+      primaryCategoryId: categoryId,
+      city,
+      state,
+    },
+    include: {
+      googlePlace: {
+        select: { rating: true, userRatingsTotal: true },
+      },
+    },
+    orderBy: { qualityScore: 'desc' },
+    take: 4,
+  });
+
+  if (related.length === 0) return null;
+
+  return (
+    <section className="mt-12 border-t border-gray-200 pt-8">
+      <h2 className="text-lg font-semibold mb-4">Similar Businesses Nearby</h2>
+      <div className="grid sm:grid-cols-2 gap-4">
+        {related.map((biz) => (
+          <Link
+            key={biz.id}
+            href={`/biz/${biz.slug}`}
+            className="block p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
+          >
+            <h3 className="font-medium text-gray-900">
+              {biz.nameEn || biz.nameKo}
+            </h3>
+            {biz.nameEn && (
+              <p className="text-sm text-gray-500">{biz.nameKo}</p>
+            )}
+            {biz.googlePlace?.rating && (
+              <div className="flex items-center text-sm mt-2">
+                <span className="text-yellow-500 mr-1">★</span>
+                <span>{biz.googlePlace.rating.toFixed(1)}</span>
+              </div>
+            )}
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function toTitleCase(str: string): string {
+  return str
+    .replace(/-/g, ' ')
+    .toLowerCase()
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}

@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Business {
+  id                Int           @id @default(autoincrement())
+  nameKo            String
+  nameEn            String?
+  phoneE164         String?
+  phoneRaw          String?
+  addressRaw        String
+  addressNorm       String?
+  city              String
+  state             String        @default("CA")
+  zip               String?
+  lat               Float?
+  lng               Float?
+  primaryCategoryId Int
+  subcategoryId     Int?
+  sourceKeys        Json          // [{source: "radiokorea", uid: "123"}, ...]
+  dedupeClusterId   Int?
+  qualityScore      Float         @default(0)
+  slug              String?       @unique
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  primaryCategory   Category      @relation("PrimaryCategory", fields: [primaryCategoryId], references: [id])
+  subcategory       Category?     @relation("Subcategory", fields: [subcategoryId], references: [id])
+  googlePlace       GooglePlace?
+
+  @@index([city, state])
+  @@index([primaryCategoryId])
+  @@index([subcategoryId])
+  @@index([dedupeClusterId])
+  @@index([phoneE164])
+  @@index([slug])
+}
+
+model Category {
+  id        Int        @id @default(autoincrement())
+  slug      String     @unique
+  nameKo    String
+  nameEn    String
+  level     String     // 'primary' | 'sub'
+  parentId  Int?
+  parent    Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children  Category[] @relation("CategoryHierarchy")
+
+  primaryBusinesses Business[] @relation("PrimaryCategory")
+  subBusinesses     Business[] @relation("Subcategory")
+
+  @@index([parentId])
+  @@index([level])
+}
+
+model GooglePlace {
+  id                Int       @id @default(autoincrement())
+  businessId        Int       @unique
+  placeId           String
+  rating            Float?
+  userRatingsTotal  Int?
+  formattedAddress  String?
+  lat               Float?
+  lng               Float?
+  openingHoursText  Json?
+  types             Json?
+  website           String?
+  phoneE164         String?
+  lastFetchedAt     DateTime
+  fetchStatus       String    // 'ok' | 'error' | 'not_found'
+
+  business          Business  @relation(fields: [businessId], references: [id])
+
+  @@index([placeId])
+  @@index([fetchStatus])
+}
+
+model EnrichmentQueue {
+  id          Int       @id @default(autoincrement())
+  businessId  Int
+  reason      String    // 'seed' | 'traffic' | 'user_click'
+  priority    Int       @default(0)
+  status      String    @default("pending") // 'pending' | 'processing' | 'done' | 'failed'
+  scheduledAt DateTime  @default(now())
+  attempts    Int       @default(0)
+  lastError   String?
+  createdAt   DateTime  @default(now())
+
+  @@index([status, priority, scheduledAt])
+  @@index([businessId])
+}
+
+model EnrichmentBudget {
+  id          Int       @id @default(autoincrement())
+  monthYear   String    @unique // "2026-01"
+  spentUsd    Float     @default(0)
+  callCount   Int       @default(0)
+}
+
+model PageMetric {
+  id          Int       @id @default(autoincrement())
+  pageKey     String    @unique // "ca/los-angeles/dentist"
+  impressions Int       @default(0)
+  clicks      Int       @default(0)
+  last30dUv   Int       @default(0)
+  updatedAt   DateTime  @updatedAt
+
+  @@index([last30dUv])
+}
