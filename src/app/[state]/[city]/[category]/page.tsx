@@ -198,13 +198,16 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
           parentCategorySlug={categoryInfo.parentSlug}
         />
 
-        <header className="mb-8">
+        <header className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">{h1Title}</h1>
           <h2 className="text-lg text-gray-700 mt-1">{koreanSubtitle}</h2>
           <p className="text-gray-600 mt-2">
             {totalCount} {UI_LABELS.businessesFound.ko} ({totalCount} {UI_LABELS.businessesFound.en})
           </p>
         </header>
+
+        {/* City Filter - at the top for easy access */}
+        <CityFilter state={state} currentCity={city} category={category} />
 
         {businesses.length === 0 ? (
           <div className="text-center py-12 bg-gray-50 rounded-lg">
@@ -250,9 +253,6 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
         {categoryInfo.level === 'primary' && (
           <SubcategoryLinks state={state} city={city} primarySlug={category} />
         )}
-
-        {/* Nearby cities */}
-        <NearbyCities state={state} currentCity={city} category={category} />
       </main>
     </>
   );
@@ -290,7 +290,7 @@ async function SubcategoryLinks({
   );
 }
 
-async function NearbyCities({
+async function CityFilter({
   state,
   currentCity,
   category,
@@ -301,12 +301,11 @@ async function NearbyCities({
 }) {
   const cityNormalized = currentCity.toUpperCase().replace(/-/g, ' ');
 
-  // Get other cities with businesses in this category
+  // Get all cities with businesses in this category (including current)
   const cities = await prisma.business.groupBy({
     by: ['city'],
     where: {
       state: state.toUpperCase(),
-      city: { not: cityNormalized },
       OR: [
         { primaryCategory: { slug: category } },
         { subcategory: { slug: category } },
@@ -314,31 +313,44 @@ async function NearbyCities({
     },
     _count: true,
     orderBy: { _count: { city: 'desc' } },
-    take: 10,
+    take: 15,
   });
 
-  if (cities.length === 0) return null;
+  if (cities.length <= 1) return null;
 
   return (
-    <section className="mt-8 border-t border-gray-200 pt-8">
-      <h2 className="text-lg font-semibold mb-4">주변 도시 (Nearby Cities)</h2>
+    <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+      <div className="flex items-center gap-2 mb-3">
+        <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span className="text-sm font-medium text-gray-700">지역 선택 (Select City)</span>
+      </div>
       <div className="flex flex-wrap gap-2">
         {cities.map((c) => {
           const citySlug = c.city.toLowerCase().replace(/\s+/g, '-');
           const cityKo = getCityNameKo(citySlug);
           const cityEn = toTitleCase(c.city);
+          const isCurrentCity = c.city === cityNormalized;
+
           return (
             <a
               key={c.city}
               href={`/${state}/${citySlug}/${category}`}
-              className="px-3 py-1.5 text-sm bg-gray-50 text-gray-600 rounded hover:bg-gray-100 transition-colors"
+              className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
+                isCurrentCity
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'
+              }`}
             >
-              {cityKo !== cityEn ? `${cityKo} (${cityEn})` : cityEn} ({c._count})
+              {cityKo !== cityEn ? cityKo : cityEn}
+              <span className="ml-1 opacity-70">({c._count})</span>
             </a>
           );
         })}
       </div>
-    </section>
+    </div>
   );
 }
 
