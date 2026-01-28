@@ -5,50 +5,64 @@ interface CategoryNavProps {
   currentState: string;
   currentCity: string;
   currentCategory?: string;
-  showSubcategories?: boolean;
+  currentSubcategory?: string;
+  parentCategorySlug?: string;
 }
 
 export function CategoryNav({
   currentState,
   currentCity,
   currentCategory,
-  showSubcategories = false,
+  currentSubcategory,
+  parentCategorySlug,
 }: CategoryNavProps) {
+  // Find the active primary category (either current or parent of current subcategory)
+  const activePrimarySlug = parentCategorySlug || currentCategory;
   const activePrimary = PRIMARY_CATEGORIES.find(
-    (c) => c.slug === currentCategory
+    (c) => c.slug === activePrimarySlug
   );
 
   return (
     <nav className="border-b border-gray-200 pb-4 mb-6">
       {/* Primary Categories */}
       <div className="flex flex-wrap gap-2">
-        {PRIMARY_CATEGORIES.map((category) => (
-          <Link
-            key={category.slug}
-            href={`/${currentState}/${currentCity}/${category.slug}`}
-            className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
-              currentCategory === category.slug
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            {category.nameEn}
-          </Link>
-        ))}
+        {PRIMARY_CATEGORIES.map((category) => {
+          const isActive = category.slug === activePrimarySlug;
+          return (
+            <Link
+              key={category.slug}
+              href={`/${currentState}/${currentCity}/${category.slug}`}
+              className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
+                isActive
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {category.nameEn}
+            </Link>
+          );
+        })}
       </div>
 
-      {/* Subcategories */}
-      {showSubcategories && activePrimary && activePrimary.subcategories.length > 0 && (
+      {/* Subcategories - show when we have an active primary category */}
+      {activePrimary && activePrimary.subcategories.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-100">
-          {activePrimary.subcategories.map((sub) => (
-            <Link
-              key={sub.slug}
-              href={`/${currentState}/${currentCity}/${sub.slug}`}
-              className="px-2 py-1 text-xs rounded bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors"
-            >
-              {sub.nameEn}
-            </Link>
-          ))}
+          {activePrimary.subcategories.map((sub) => {
+            const isActiveSub = currentSubcategory === sub.slug;
+            return (
+              <Link
+                key={sub.slug}
+                href={`/${currentState}/${currentCity}/${sub.slug}`}
+                className={`px-2 py-1 text-xs rounded transition-colors ${
+                  isActiveSub
+                    ? 'bg-blue-100 text-blue-700 font-medium'
+                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                {sub.nameEn}
+              </Link>
+            );
+          })}
         </div>
       )}
     </nav>

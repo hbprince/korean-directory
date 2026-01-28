@@ -77,6 +77,7 @@ async function getCategoryInfo(slug: string): Promise<{
   nameKo: string;
   level: string;
   parentNameEn?: string;
+  parentSlug?: string;
 } | null> {
   const category = await prisma.category.findUnique({
     where: { slug },
@@ -92,6 +93,7 @@ async function getCategoryInfo(slug: string): Promise<{
     nameKo: category.nameKo,
     level: category.level,
     parentNameEn: category.parent?.nameEn,
+    parentSlug: category.parent?.slug,
   };
 }
 
@@ -191,8 +193,9 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
         <CategoryNav
           currentState={state}
           currentCity={city}
-          currentCategory={category}
-          showSubcategories={categoryInfo.level === 'primary'}
+          currentCategory={categoryInfo.level === 'primary' ? category : undefined}
+          currentSubcategory={categoryInfo.level === 'sub' ? category : undefined}
+          parentCategorySlug={categoryInfo.parentSlug}
         />
 
         <header className="mb-8">
