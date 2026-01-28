@@ -145,24 +145,32 @@ export const RADIOKOREA_MAPPING: Record<string, { primary: string; sub?: string 
 };
 
 // KoreaDaily category_id to our primary category mapping
+// Based on actual source data category_names
 export const KOREADAILY_PRIMARY_MAPPING: Record<number, string> = {
-  1: 'community',     // 종교
-  2: 'community',     // 커뮤니티
-  3: 'community',     // 미디어
-  4: 'shopping',      // 쇼핑
-  5: 'food',          // 식당
-  6: 'beauty',        // 뷰티
-  7: 'medical',       // 병원
-  8: 'dental',        // 치과
-  9: 'legal',         // 법률
-  10: 'insurance',    // 보험
-  11: 'real-estate',  // 부동산
-  12: 'financial',    // 금융
-  13: 'auto',         // 자동차
-  14: 'home-services', // 주택서비스
-  15: 'education',    // 교육
-  16: 'travel',       // 여행
-  17: 'professional', // 전문서비스
+  5: 'food',            // 식당
+  6: 'medical',         // 병원/약국
+  7: 'shopping',        // 쇼핑
+  8: 'dental',          // 치과
+  9: 'medical',         // 성형외과 -> medical (plastic surgery)
+  10: 'beauty',         // 미용/뷰티
+  11: 'travel',         // 여행/관광
+  12: 'insurance',      // 보험
+  13: 'medical',        // 건강
+  14: 'legal',          // 변호사
+  15: 'real-estate',    // 부동산
+  16: 'auto',           // 자동차
+  17: 'financial',      // 은행/금융
+  18: 'food',           // 마켓 -> food (grocery)
+  19: 'auto',           // 택시/대리 -> auto
+  20: 'education',      // 학교/학원
+  21: 'community',      // 운동/오락 -> community
+  22: 'home-services',  // 이사/택배 -> home-services (moving)
+  23: 'financial',      // 회계사 -> financial (CPA)
+  24: 'food',           // 노래/주점 -> food (entertainment dining)
+  25: 'home-services',  // 건축/설계 -> home-services (construction)
+  26: 'shopping',       // 컴퓨터 -> shopping
+  27: 'community',      // 종교
+  28: 'community',      // 단체/기관
 };
 
 // KoreaDaily sub_idx to our subcategory mapping (by primary category)
