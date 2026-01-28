@@ -4,25 +4,63 @@ import prisma from '@/lib/db/prisma';
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
+// Canonical base URL - MUST be https://www.haninmap.com
 const BASE_URL = 'https://www.haninmap.com';
+
+/**
+ * Normalize and validate a URL path segment
+ * Returns null if invalid
+ */
+function normalizeSlug(value: string | null | undefined): string | null {
+  if (!value || typeof value !== 'string') return null;
+  const normalized = value
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')      // spaces to hyphens
+    .replace(/-+/g, '-')       // multiple hyphens to single
+    .replace(/^-|-$/g, '');    // trim leading/trailing hyphens
+
+  // Must have content after normalization
+  if (!normalized || normalized === 'undefined' || normalized === 'null') {
+    return null;
+  }
+  return normalized;
+}
+
+/**
+ * Build a valid sitemap URL
+ * Returns null if any segment is invalid
+ */
+function buildUrl(...segments: (string | null | undefined)[]): string | null {
+  const normalized = segments.map(s => normalizeSlug(s));
+
+  // All segments must be valid
+  if (normalized.some(s => s === null)) {
+    return null;
+  }
+
+  const path = normalized.join('/');
+
+  // Validate no double slashes
+  if (path.includes('//')) {
+    return null;
+  }
+
+  return `${BASE_URL}/${path}`;
+}
 
 export async function GET() {
   try {
-    // Build sitemap XML
-    let xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-`;
+    const urls: Array<{ loc: string; changefreq: string; priority: string; lastmod?: string }> = [];
 
     // Homepage
-    xml += `  <url>
-    <loc>${BASE_URL}</loc>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-`;
+    urls.push({
+      loc: BASE_URL,
+      changefreq: 'daily',
+      priority: '1.0',
+    });
 
-    // Get all city/state/category combinations that have businesses (count > 0)
-    // L1: Primary categories
+    // Get all city/state/category combinations that have businesses
     const primaryCategoryCounts = await prisma.business.groupBy({
       by: ['city', 'state', 'primaryCategoryId'],
       _count: true,
@@ -36,24 +74,29 @@ export async function GET() {
 
     // Track unique URLs to avoid duplicates
     const addedUrls = new Set<string>();
+    addedUrls.add(BASE_URL);
 
-    // L1 pages (primary categories with results)
+    // L1 pages (primary categories with results > 0)
     for (const item of primaryCategoryCounts) {
-      const category = categoryMap.get(item.primaryCategoryId);
-      if (!category || category.level !== 'primary') continue;
+      // Skip if no results
+      if (!item._count || item._count === 0) continue;
 
-      const citySlug = item.city.toLowerCase().replace(/\s+/g, '-');
-      const stateSlug = item.state.toLowerCase();
-      const url = `${BASE_URL}/${stateSlug}/${citySlug}/${category.slug}`;
+      // Skip if missing required fields
+      if (!item.city || !item.state || !item.primaryCategoryId) continue;
+
+      const category = categoryMap.get(item.primaryCategoryId);
+      if (!category || category.level !== 'primary' || !category.slug) continue;
+
+      const url = buildUrl(item.state, item.city, category.slug);
+      if (!url) continue;
 
       if (!addedUrls.has(url)) {
         addedUrls.add(url);
-        xml += `  <url>
-    <loc>${url}</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-`;
+        urls.push({
+          loc: url,
+          changefreq: 'weekly',
+          priority: '0.8',
+        });
       }
     }
 
@@ -67,26 +110,29 @@ export async function GET() {
     });
 
     for (const item of subcategoryCounts) {
-      if (!item.subcategoryId) continue;
-      const category = categoryMap.get(item.subcategoryId);
-      if (!category || category.level !== 'sub') continue;
+      // Skip if no results
+      if (!item._count || item._count === 0) continue;
 
-      const citySlug = item.city.toLowerCase().replace(/\s+/g, '-');
-      const stateSlug = item.state.toLowerCase();
-      const url = `${BASE_URL}/${stateSlug}/${citySlug}/${category.slug}`;
+      // Skip if missing required fields
+      if (!item.subcategoryId || !item.city || !item.state) continue;
+
+      const category = categoryMap.get(item.subcategoryId);
+      if (!category || category.level !== 'sub' || !category.slug) continue;
+
+      const url = buildUrl(item.state, item.city, category.slug);
+      if (!url) continue;
 
       if (!addedUrls.has(url)) {
         addedUrls.add(url);
-        xml += `  <url>
-    <loc>${url}</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-`;
+        urls.push({
+          loc: url,
+          changefreq: 'weekly',
+          priority: '0.7',
+        });
       }
     }
 
-    // L3 pages (only indexable ones)
+    // L3 pages (only indexable businesses with valid slugs)
     const indexableBusinesses = await prisma.business.findMany({
       where: {
         slug: { not: null },
@@ -100,22 +146,49 @@ export async function GET() {
         slug: true,
         updatedAt: true,
       },
-      take: 10000, // Limit to prevent huge sitemaps
+      take: 10000,
     });
 
     for (const biz of indexableBusinesses) {
-      if (biz.slug) {
-        xml += `  <url>
-    <loc>${BASE_URL}/biz/${biz.slug}</loc>
-    <lastmod>${biz.updatedAt.toISOString().split('T')[0]}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-`;
+      const slug = normalizeSlug(biz.slug);
+      if (!slug) continue;
+
+      const url = `${BASE_URL}/biz/${slug}`;
+
+      if (!addedUrls.has(url)) {
+        addedUrls.add(url);
+        urls.push({
+          loc: url,
+          changefreq: 'monthly',
+          priority: '0.6',
+          lastmod: biz.updatedAt.toISOString().split('T')[0],
+        });
       }
     }
 
+    // Build XML
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+`;
+
+    for (const url of urls) {
+      xml += `  <url>
+    <loc>${url.loc}</loc>`;
+      if (url.lastmod) {
+        xml += `
+    <lastmod>${url.lastmod}</lastmod>`;
+      }
+      xml += `
+    <changefreq>${url.changefreq}</changefreq>
+    <priority>${url.priority}</priority>
+  </url>
+`;
+    }
+
     xml += '</urlset>';
+
+    // Log for debugging
+    console.log(`Sitemap generated: ${urls.length} URLs`);
 
     return new NextResponse(xml, {
       headers: {
