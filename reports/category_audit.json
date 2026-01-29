@@ -1,0 +1,156 @@
+{
+  "timestamp": "2026-01-29T05:32:07.892Z",
+  "summary": {
+    "totalBusinesses": 62570,
+    "totalCategories": 133,
+    "primaryCategories": 15,
+    "subCategories": 118,
+    "noPrimaryCategory": 0,
+    "noSubCategory": 41370
+  },
+  "categoryDistribution": {
+    "primary": [
+      {
+        "slug": "food",
+        "nameKo": "식당",
+        "nameEn": "Food & Dining",
+        "count": 8016,
+        "percentage": "12.81%"
+      },
+      {
+        "slug": "community",
+        "nameKo": "커뮤니티",
+        "nameEn": "Community",
+        "count": 7707,
+        "percentage": "12.32%"
+      },
+      {
+        "slug": "home-services",
+        "nameKo": "주택서비스",
+        "nameEn": "Home Services",
+        "count": 7460,
+        "percentage": "11.92%"
+      },
+      {
+        "slug": "shopping",
+        "nameKo": "쇼핑",
+        "nameEn": "Shopping",
+        "count": 6907,
+        "percentage": "11.04%"
+      },
+      {
+        "slug": "medical",
+        "nameKo": "병원",
+        "nameEn": "Medical",
+        "count": 6086,
+        "percentage": "9.73%"
+      },
+      {
+        "slug": "real-estate",
+        "nameKo": "부동산",
+        "nameEn": "Real Estate",
+        "count": 4353,
+        "percentage": "6.96%"
+      },
+      {
+        "slug": "financial",
+        "nameKo": "금융",
+        "nameEn": "Financial",
+        "count": 3827,
+        "percentage": "6.12%"
+      },
+      {
+        "slug": "auto",
+        "nameKo": "자동차",
+        "nameEn": "Auto Services",
+        "count": 3702,
+        "percentage": "5.92%"
+      },
+      {
+        "slug": "legal",
+        "nameKo": "법률",
+        "nameEn": "Legal",
+        "count": 2770,
+        "percentage": "4.43%"
+      },
+      {
+        "slug": "beauty",
+        "nameKo": "뷰티",
+        "nameEn": "Beauty",
+        "count": 2528,
+        "percentage": "4.04%"
+      },
+      {
+        "slug": "professional",
+        "nameKo": "전문서비스",
+        "nameEn": "Professional Services",
+        "count": 2395,
+        "percentage": "3.83%"
+      },
+      {
+        "slug": "insurance",
+        "nameKo": "보험",
+        "nameEn": "Insurance",
+        "count": 2160,
+        "percentage": "3.45%"
+      },
+      {
+        "slug": "education",
+        "nameKo": "교육",
+        "nameEn": "Education",
+        "count": 1901,
+        "percentage": "3.04%"
+      },
+      {
+        "slug": "dental",
+        "nameKo": "치과",
+        "nameEn": "Dental",
+        "count": 1767,
+        "percentage": "2.82%"
+      },
+      {
+        "slug": "travel",
+        "nameKo": "여행",
+        "nameEn": "Travel",
+        "count": 991,
+        "percentage": "1.58%"
+      }
+    ]
+  },
+  "sourceBreakdown": {
+    "radiokorea": {
+      "community": 4147,
+      "home-services": 3619,
+      "shopping": 4070,
+      "food": 3921,
+      "legal": 1339,
+      "education": 402,
+      "dental": 736,
+      "beauty": 1791,
+      "professional": 2395,
+      "financial": 2125,
+      "real-estate": 1454,
+      "medical": 2439,
+      "insurance": 1128,
+      "auto": 1907,
+      "travel": 345
+    },
+    "koreadaily": {
+      "food": 4123,
+      "medical": 3647,
+      "home-services": 3841,
+      "auto": 1795,
+      "education": 1499,
+      "travel": 646,
+      "community": 3560,
+      "shopping": 2837,
+      "dental": 1031,
+      "legal": 1431,
+      "financial": 1702,
+      "real-estate": 2899,
+      "beauty": 737,
+      "insurance": 1032
+    }
+  },
+  "anomalies": []
+}

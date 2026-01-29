@@ -6,12 +6,11 @@ import { CategoryNav } from '@/components/CategoryNav';
 import { Pagination } from '@/components/Pagination';
 import { FAQSection, generateCategoryFAQs } from '@/components/FAQSection';
 import {
-  getPrimaryCategory,
   isPrimaryCategory,
   isSubcategory,
 } from '@/lib/taxonomy/categories';
 import { generateL1Metadata, generateL2Metadata, generateItemListSchema } from '@/lib/seo/meta';
-import { getCityNameKo, UI_LABELS } from '@/lib/i18n/labels';
+import { getCityNameKo, getStateNameKo, UI_LABELS } from '@/lib/i18n/labels';
 
 const ITEMS_PER_PAGE = 20;
 const BASE_URL = 'https://www.haninmap.com';
@@ -112,19 +111,24 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   const categoryInfo = await getCategoryInfo(category);
   if (!categoryInfo) notFound();
 
+  const isAllCities = city.toLowerCase() === 'all';
   const cityNormalized = city.toUpperCase().replace(/-/g, ' ');
   const stateNormalized = state.toUpperCase();
 
-  // Build where clause based on category type
+  // Build where clause based on category type and city filter
+  // Exclude "Unknown" cities from results
+  const baseWhere = {
+    state: stateNormalized,
+    city: isAllCities ? { not: 'Unknown' } : cityNormalized,
+  };
+
   const whereClause = categoryInfo.level === 'primary'
     ? {
-        city: cityNormalized,
-        state: stateNormalized,
+        ...baseWhere,
         primaryCategory: { slug: category },
       }
     : {
-        city: cityNormalized,
-        state: stateNormalized,
+        ...baseWhere,
         subcategory: { slug: category },
       };
 
@@ -151,14 +155,19 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
     take: ITEMS_PER_PAGE,
   });
 
-  // Generate page title (English primary for H1)
+  // Generate page title (Korean primary for H1)
   const cityDisplay = toTitleCase(city);
   const cityKo = getCityNameKo(city);
   const stateDisplay = stateNormalized;
-  // H1: English primary
-  const h1Title = `Korean ${categoryInfo.nameEn} in ${cityDisplay}, ${stateDisplay}`;
-  // H2/subtitle: Korean with context
-  const koreanSubtitle = `${cityKo} 한인 ${categoryInfo.nameKo} (한국어 상담 가능)`;
+
+  // Handle "all" city case
+  const locationKo = isAllCities ? `${getStateNameKo(stateDisplay)} 전체` : cityKo;
+  const locationEn = isAllCities ? `All of ${stateDisplay}` : `${cityDisplay}, ${stateDisplay}`;
+
+  // H1: Korean primary with English in parentheses
+  const h1Title = `${locationKo} 한인 ${categoryInfo.nameKo} (${categoryInfo.nameEn} in ${locationEn})`;
+  // H2/subtitle: Additional context
+  const koreanSubtitle = `한국어 상담 가능 | Korean-speaking ${categoryInfo.nameEn.toLowerCase()}`;
 
   // Only generate FAQs if there are results
   const faqs = totalCount > 0 ? generateCategoryFAQs({
@@ -248,45 +257,8 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
         )}
 
         {faqs.length > 0 && <FAQSection faqs={faqs} />}
-
-        {/* Internal links to subcategories */}
-        {categoryInfo.level === 'primary' && (
-          <SubcategoryLinks state={state} city={city} primarySlug={category} />
-        )}
       </main>
     </>
-  );
-}
-
-async function SubcategoryLinks({
-  state,
-  city,
-  primarySlug,
-}: {
-  state: string;
-  city: string;
-  primarySlug: string;
-}) {
-  const primary = getPrimaryCategory(primarySlug);
-  if (!primary || primary.subcategories.length === 0) return null;
-
-  return (
-    <section className="mt-12 border-t border-gray-200 pt-8">
-      <h2 className="text-lg font-semibold mb-4">
-        {primary.nameKo} 전문 분야 (Browse {primary.nameEn} Specialists)
-      </h2>
-      <div className="flex flex-wrap gap-2">
-        {primary.subcategories.map((sub) => (
-          <a
-            key={sub.slug}
-            href={`/${state}/${city}/${sub.slug}`}
-            className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors"
-          >
-            {sub.nameKo} | {sub.nameEn}
-          </a>
-        ))}
-      </div>
-    </section>
   );
 }
 
@@ -300,12 +272,14 @@ async function CityFilter({
   category: string;
 }) {
   const cityNormalized = currentCity.toUpperCase().replace(/-/g, ' ');
+  const isAllCities = currentCity === 'all';
 
-  // Get all cities with businesses in this category (including current)
+  // Get all cities with businesses in this category, excluding Unknown
   const cities = await prisma.business.groupBy({
     by: ['city'],
     where: {
       state: state.toUpperCase(),
+      city: { not: 'Unknown' },
       OR: [
         { primaryCategory: { slug: category } },
         { subcategory: { slug: category } },
@@ -313,7 +287,19 @@ async function CityFilter({
     },
     _count: true,
     orderBy: { _count: { city: 'desc' } },
-    take: 15,
+    take: 20,
+  });
+
+  // Get total count for "All" option
+  const totalCount = await prisma.business.count({
+    where: {
+      state: state.toUpperCase(),
+      city: { not: 'Unknown' },
+      OR: [
+        { primaryCategory: { slug: category } },
+        { subcategory: { slug: category } },
+      ],
+    },
   });
 
   if (cities.length <= 1) return null;
@@ -328,11 +314,31 @@ async function CityFilter({
         <span className="text-sm font-medium text-gray-700">지역 선택 (Select City)</span>
       </div>
       <div className="flex flex-wrap gap-2">
+        {/* "All" option first */}
+        <a
+          href={`/${state}/all/${category}`}
+          className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
+            isAllCities
+              ? 'bg-blue-600 text-white'
+              : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'
+          }`}
+        >
+          전체 (All)
+          <span className="ml-1 opacity-70">({totalCount.toLocaleString()})</span>
+        </a>
+
+        {/* City chips - Korean (English) format */}
         {cities.map((c) => {
+          // Skip Unknown cities
+          if (c.city.toLowerCase() === 'unknown') return null;
+
           const citySlug = c.city.toLowerCase().replace(/\s+/g, '-');
           const cityKo = getCityNameKo(citySlug);
           const cityEn = toTitleCase(c.city);
           const isCurrentCity = c.city === cityNormalized;
+
+          // Format: 한글 (English) or just English if no Korean mapping
+          const displayName = cityKo !== cityEn ? `${cityKo} (${cityEn})` : cityEn;
 
           return (
             <a
@@ -344,7 +350,7 @@ async function CityFilter({
                   : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'
               }`}
             >
-              {cityKo !== cityEn ? cityKo : cityEn}
+              {displayName}
               <span className="ml-1 opacity-70">({c._count})</span>
             </a>
           );

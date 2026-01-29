@@ -1,0 +1,314 @@
+{
+  "timestamp": "2026-01-29T06:54:33.589Z",
+  "newSubcategories": [
+    "optometrist",
+    "health-supplements",
+    "laundry",
+    "fitness",
+    "nightlife",
+    "shipping",
+    "logistics"
+  ],
+  "changes": [
+    {
+      "category": "B1: 검안의",
+      "description": "RadioKorea B10 검안의 moved from ophthalmology to optometrist",
+      "affected": 8,
+      "samples": [
+        {
+          "id": 14435,
+          "nameKo": "쉐린이검안과",
+          "oldCategory": "ophthalmology",
+          "newCategory": "optometrist"
+        },
+        {
+          "id": 14436,
+          "nameKo": "쉐린이검안과",
+          "oldCategory": "ophthalmology",
+          "newCategory": "optometrist"
+        },
+        {
+          "id": 14437,
+          "nameKo": "신세계어린이검안안경센터",
+          "oldCategory": "ophthalmology",
+          "newCategory": "optometrist"
+        },
+        {
+          "id": 14449,
+          "nameKo": "유성대검안과안경원",
+          "oldCategory": "ophthalmology",
+          "newCategory": "optometrist"
+        },
+        {
+          "id": 14463,
+          "nameKo": "피앗럭스검안의",
+          "oldCategory": "ophthalmology",
+          "newCategory": "optometrist"
+        }
+      ]
+    },
+    {
+      "category": "B2: 건강식품 -> health-supplements",
+      "description": "KoreaDaily category 13 health supplements",
+      "affected": 88,
+      "samples": [
+        {
+          "id": 49026,
+          "nameKo": "건강마을",
+          "oldCategory": "shopping (no sub)",
+          "newCategory": "shopping>health-supplements"
+        },
+        {
+          "id": 49027,
+          "nameKo": "금산K인삼농수산물직판점",
+          "oldCategory": "shopping (no sub)",
+          "newCategory": "shopping>health-supplements"
+        },
+        {
+          "id": 49044,
+          "nameKo": "슈퍼헬스건강센터",
+          "oldCategory": "shopping (no sub)",
+          "newCategory": "shopping>health-supplements"
+        },
+        {
+          "id": 49054,
+          "nameKo": "우리마트건강코너",
+          "oldCategory": "shopping (no sub)",
+          "newCategory": "shopping>health-supplements"
+        },
+        {
+          "id": 49072,
+          "nameKo": "천매건강식품",
+          "oldCategory": "shopping (no sub)",
+          "newCategory": "shopping>health-supplements"
+        }
+      ]
+    },
+    {
+      "category": "B2: 건강식품 -> korean-medicine",
+      "description": "KoreaDaily category 13 Korean medicine clinics",
+      "affected": 24,
+      "samples": [
+        {
+          "id": 49150,
+          "nameKo": "치료경락지압전문",
+          "oldCategory": "shopping (no sub)",
+          "newCategory": "medical>korean-medicine"
+        },
+        {
+          "id": 53224,
+          "nameKo": "동양건강진료소",
+          "oldCategory": "shopping (no sub)",
+          "newCategory": "medical>korean-medicine"
+        },
+        {
+          "id": 53313,
+          "nameKo": "강침술원",
+          "oldCategory": "shopping (no sub)",
+          "newCategory": "medical>korean-medicine"
+        },
+        {
+          "id": 53520,
+          "nameKo": "케이피티지압치료실",
+          "oldCategory": "shopping (no sub)",
+          "newCategory": "medical>korean-medicine"
+        },
+        {
+          "id": 48412,
+          "nameKo": "슬립갤러리(씰리침대)",
+          "oldCategory": "shopping (no sub)",
+          "newCategory": "medical>korean-medicine"
+        }
+      ]
+    },
+    {
+      "category": "B3: 세탁소",
+      "description": "Laundry businesses moved from professional to home-services>laundry",
+      "affected": 85,
+      "samples": [
+        {
+          "id": 19228,
+          "nameKo": "뮤러세탁소",
+          "oldCategory": "professional",
+          "newCategory": "home-services>laundry"
+        },
+        {
+          "id": 19229,
+          "nameKo": "미드웨스트세탁소",
+          "oldCategory": "professional",
+          "newCategory": "home-services>laundry"
+        },
+        {
+          "id": 19450,
+          "nameKo": "타운센터드라이브크리너스",
+          "oldCategory": "professional",
+          "newCategory": "home-services>laundry"
+        },
+        {
+          "id": 19138,
+          "nameKo": "가든세탁기드라이어수리",
+          "oldCategory": "professional",
+          "newCategory": "home-services>laundry"
+        },
+        {
+          "id": 19139,
+          "nameKo": "가야세탁기드라이어수리",
+          "oldCategory": "professional",
+          "newCategory": "home-services>laundry"
+        }
+      ]
+    },
+    {
+      "category": "B4: Fitness",
+      "description": "Gym/fitness businesses moved from beauty to community>fitness",
+      "affected": 16,
+      "samples": [
+        {
+          "id": 11267,
+          "nameKo": "하나뷰티&헬스",
+          "oldCategory": "beauty",
+          "newCategory": "community>fitness"
+        },
+        {
+          "id": 18518,
+          "nameKo": "넬리스운동기구전문점",
+          "oldCategory": "beauty",
+          "newCategory": "community>fitness"
+        },
+        {
+          "id": 18591,
+          "nameKo": "블레이징피트니스",
+          "oldCategory": "beauty",
+          "newCategory": "community>fitness"
+        },
+        {
+          "id": 18612,
+          "nameKo": "세계격투기챔피언체육관",
+          "oldCategory": "beauty",
+          "newCategory": "community>fitness"
+        },
+        {
+          "id": 18662,
+          "nameKo": "에이원 피트니스",
+          "oldCategory": "beauty",
+          "newCategory": "community>fitness"
+        }
+      ]
+    },
+    {
+      "category": "B5: Nightlife",
+      "description": "Nightlife businesses assigned to food>nightlife subcategory",
+      "affected": 463,
+      "samples": [
+        {
+          "id": 33445,
+          "nameKo": "바르도",
+          "oldCategory": "food (no sub)",
+          "newCategory": "food>nightlife"
+        },
+        {
+          "id": 33442,
+          "nameKo": "미스터보바",
+          "oldCategory": "food (no sub)",
+          "newCategory": "food>nightlife"
+        },
+        {
+          "id": 33447,
+          "nameKo": "베버리바",
+          "oldCategory": "food (no sub)",
+          "newCategory": "food>nightlife"
+        },
+        {
+          "id": 33441,
+          "nameKo": "미스터보바",
+          "oldCategory": "food (no sub)",
+          "newCategory": "food>nightlife"
+        },
+        {
+          "id": 8437,
+          "nameKo": "가인가라오케",
+          "oldCategory": "food (no sub)",
+          "newCategory": "food>nightlife"
+        }
+      ]
+    },
+    {
+      "category": "B6: Shipping",
+      "description": "Courier/parcel businesses split from moving to shipping",
+      "affected": 26,
+      "samples": [
+        {
+          "id": 29834,
+          "nameKo": "U AND J EXPRESS",
+          "oldCategory": "moving",
+          "newCategory": "shipping"
+        },
+        {
+          "id": 29774,
+          "nameKo": "현대택배-라스베가스점",
+          "oldCategory": "moving",
+          "newCategory": "shipping"
+        },
+        {
+          "id": 29630,
+          "nameKo": "위즈와-국제배송",
+          "oldCategory": "moving",
+          "newCategory": "shipping"
+        },
+        {
+          "id": 29671,
+          "nameKo": "일신해운항공택배",
+          "oldCategory": "moving",
+          "newCategory": "shipping"
+        },
+        {
+          "id": 29676,
+          "nameKo": "장군택배 (조이택배)",
+          "oldCategory": "moving",
+          "newCategory": "shipping"
+        }
+      ]
+    },
+    {
+      "category": "B6: Logistics",
+      "description": "Warehouse/customs businesses split from moving to logistics",
+      "affected": 47,
+      "samples": [
+        {
+          "id": 29804,
+          "nameKo": "ALLIANCE GLOBAL LOGISTICS, INC",
+          "oldCategory": "moving",
+          "newCategory": "logistics"
+        },
+        {
+          "id": 29812,
+          "nameKo": "G&O LOGISTICS INC",
+          "oldCategory": "moving",
+          "newCategory": "logistics"
+        },
+        {
+          "id": 29820,
+          "nameKo": "KCS LOGISTICS LLC",
+          "oldCategory": "moving",
+          "newCategory": "logistics"
+        },
+        {
+          "id": 29839,
+          "nameKo": "3 PLUS LOGISTICS CO.",
+          "oldCategory": "moving",
+          "newCategory": "logistics"
+        },
+        {
+          "id": 29537,
+          "nameKo": "선베이운송통관회사",
+          "oldCategory": "moving",
+          "newCategory": "logistics"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "totalAffected": 757,
+    "newSubcategoriesCreated": 7
+  }
+}

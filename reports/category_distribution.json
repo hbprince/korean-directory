@@ -1,0 +1,771 @@
+{
+  "timestamp": "2026-01-29T06:55:12.702Z",
+  "summary": {
+    "totalBusinesses": 63811,
+    "bySource": {
+      "radiokorea": 33059,
+      "koreadaily": 30752,
+      "unknown": 0
+    },
+    "byPrimaryCategory": {
+      "home-services": 7818,
+      "community": 7819,
+      "food": 8138,
+      "shopping": 8291,
+      "medical": 5384,
+      "legal": 2770,
+      "education": 1901,
+      "dental": 1767,
+      "professional": 2378,
+      "auto": 3702,
+      "beauty": 2512,
+      "real-estate": 4353,
+      "financial": 3827,
+      "insurance": 2160,
+      "travel": 991
+    }
+  },
+  "primaryBySource": {
+    "radiokorea": {
+      "community": 4259,
+      "home-services": 3977,
+      "shopping": 4747,
+      "food": 4043,
+      "legal": 1339,
+      "education": 402,
+      "dental": 736,
+      "professional": 2378,
+      "beauty": 1775,
+      "real-estate": 1454,
+      "financial": 2125,
+      "medical": 2444,
+      "insurance": 1128,
+      "auto": 1907,
+      "travel": 345
+    },
+    "koreadaily": {
+      "home-services": 3841,
+      "food": 4095,
+      "shopping": 3544,
+      "medical": 2940,
+      "auto": 1795,
+      "education": 1499,
+      "community": 3560,
+      "financial": 1702,
+      "real-estate": 2899,
+      "travel": 646,
+      "beauty": 737,
+      "dental": 1031,
+      "insurance": 1032,
+      "legal": 1431
+    },
+    "all": {
+      "home-services": 7818,
+      "community": 7819,
+      "food": 8138,
+      "shopping": 8291,
+      "medical": 5384,
+      "legal": 2770,
+      "education": 1901,
+      "dental": 1767,
+      "professional": 2378,
+      "auto": 3702,
+      "beauty": 2512,
+      "real-estate": 4353,
+      "financial": 3827,
+      "insurance": 2160,
+      "travel": 991
+    }
+  },
+  "subBySource": {
+    "radiokorea": {
+      "organization": 1898,
+      "hvac": 541,
+      "nightlife": 98,
+      "notary": 359,
+      "dance-school": 32,
+      "martial-arts": 168,
+      "church": 1144,
+      "bakery": 165,
+      "roofing": 138,
+      "grocery": 783,
+      "funeral": 127,
+      "construction": 1747,
+      "temple": 79,
+      "furniture": 204,
+      "hair-salon": 741,
+      "jewelry": 261,
+      "tax-preparer": 276,
+      "internal-medicine": 445,
+      "ophthalmology": 99,
+      "spa": 287,
+      "photography": 199,
+      "skin-care": 444,
+      "japanese-restaurant": 514,
+      "chinese-restaurant": 168,
+      "western-restaurant": 744,
+      "korean-restaurant": 1290,
+      "music-school": 118,
+      "optical": 151,
+      "pain-management": 337,
+      "orthopedics": 76,
+      "pharmacy": 229,
+      "senior-center": 174,
+      "auto-repair": 748,
+      "car-wash": 80,
+      "tires": 95,
+      "bookstore": 71,
+      "electrical": 273,
+      "electronics": 556,
+      "clothing": 425,
+      "landscaping": 220,
+      "signage": 192,
+      "cpa": 758,
+      "advertising": 295,
+      "florist": 247,
+      "rehabilitation": 58,
+      "media": 225,
+      "travel-agency": 242,
+      "wedding": 75,
+      "fitness": 16,
+      "mortgage-broker": 566,
+      "laundry": 85,
+      "printing": 293,
+      "moving": 490,
+      "car-rental": 99,
+      "car-dealer": 601,
+      "obgyn": 97,
+      "plastic-surgery": 159,
+      "psychiatry": 79,
+      "oncology": 31,
+      "general-surgery": 41,
+      "ent": 22,
+      "optometrist": 8,
+      "shipping": 26,
+      "logistics": 47,
+      "driving-school": 84,
+      "bank": 514,
+      "diagnostics": 27,
+      "pediatrics": 83,
+      "towing": 27,
+      "locksmith": 155,
+      "podiatry": 51,
+      "urology": 17,
+      "allergy": 18,
+      "dermatology": 47,
+      "pulmonology": 2,
+      "escrow": 65,
+      "barbershop": 58
+    },
+    "koreadaily": {
+      "health-supplements": 88,
+      "korean-medicine": 24,
+      "nightlife": 365
+    },
+    "all": {
+      "organization": 1898,
+      "hvac": 541,
+      "nightlife": 463,
+      "notary": 359,
+      "dance-school": 32,
+      "martial-arts": 168,
+      "church": 1144,
+      "bakery": 165,
+      "roofing": 138,
+      "grocery": 783,
+      "health-supplements": 88,
+      "funeral": 127,
+      "construction": 1747,
+      "temple": 79,
+      "furniture": 204,
+      "hair-salon": 741,
+      "jewelry": 261,
+      "tax-preparer": 276,
+      "internal-medicine": 445,
+      "ophthalmology": 99,
+      "spa": 287,
+      "photography": 199,
+      "skin-care": 444,
+      "japanese-restaurant": 514,
+      "chinese-restaurant": 168,
+      "western-restaurant": 744,
+      "korean-restaurant": 1290,
+      "korean-medicine": 24,
+      "music-school": 118,
+      "optical": 151,
+      "pain-management": 337,
+      "orthopedics": 76,
+      "pharmacy": 229,
+      "senior-center": 174,
+      "auto-repair": 748,
+      "car-wash": 80,
+      "tires": 95,
+      "bookstore": 71,
+      "electrical": 273,
+      "electronics": 556,
+      "clothing": 425,
+      "landscaping": 220,
+      "signage": 192,
+      "cpa": 758,
+      "advertising": 295,
+      "florist": 247,
+      "rehabilitation": 58,
+      "media": 225,
+      "travel-agency": 242,
+      "wedding": 75,
+      "fitness": 16,
+      "mortgage-broker": 566,
+      "laundry": 85,
+      "printing": 293,
+      "moving": 490,
+      "car-rental": 99,
+      "car-dealer": 601,
+      "obgyn": 97,
+      "plastic-surgery": 159,
+      "psychiatry": 79,
+      "oncology": 31,
+      "general-surgery": 41,
+      "ent": 22,
+      "optometrist": 8,
+      "shipping": 26,
+      "logistics": 47,
+      "driving-school": 84,
+      "bank": 514,
+      "diagnostics": 27,
+      "pediatrics": 83,
+      "towing": 27,
+      "locksmith": 155,
+      "podiatry": 51,
+      "urology": 17,
+      "allergy": 18,
+      "dermatology": 47,
+      "pulmonology": 2,
+      "escrow": 65,
+      "barbershop": 58
+    }
+  },
+  "top50SubcategoriesBySource": {
+    "radiokorea": [
+      {
+        "slug": "organization",
+        "nameKo": "단체",
+        "count": 1898
+      },
+      {
+        "slug": "construction",
+        "nameKo": "건축",
+        "count": 1747
+      },
+      {
+        "slug": "korean-restaurant",
+        "nameKo": "한식",
+        "count": 1290
+      },
+      {
+        "slug": "church",
+        "nameKo": "교회",
+        "count": 1144
+      },
+      {
+        "slug": "grocery",
+        "nameKo": "마켓",
+        "count": 783
+      },
+      {
+        "slug": "cpa",
+        "nameKo": "공인회계사",
+        "count": 758
+      },
+      {
+        "slug": "auto-repair",
+        "nameKo": "자동차수리",
+        "count": 748
+      },
+      {
+        "slug": "western-restaurant",
+        "nameKo": "양식",
+        "count": 744
+      },
+      {
+        "slug": "hair-salon",
+        "nameKo": "미용실",
+        "count": 741
+      },
+      {
+        "slug": "car-dealer",
+        "nameKo": "자동차매매",
+        "count": 601
+      },
+      {
+        "slug": "mortgage-broker",
+        "nameKo": "모기지",
+        "count": 566
+      },
+      {
+        "slug": "electronics",
+        "nameKo": "전자제품",
+        "count": 556
+      },
+      {
+        "slug": "hvac",
+        "nameKo": "냉난방",
+        "count": 541
+      },
+      {
+        "slug": "japanese-restaurant",
+        "nameKo": "일식",
+        "count": 514
+      },
+      {
+        "slug": "bank",
+        "nameKo": "은행",
+        "count": 514
+      },
+      {
+        "slug": "moving",
+        "nameKo": "이삿짐",
+        "count": 490
+      },
+      {
+        "slug": "internal-medicine",
+        "nameKo": "내과",
+        "count": 445
+      },
+      {
+        "slug": "skin-care",
+        "nameKo": "스킨케어",
+        "count": 444
+      },
+      {
+        "slug": "clothing",
+        "nameKo": "의류",
+        "count": 425
+      },
+      {
+        "slug": "notary",
+        "nameKo": "공증",
+        "count": 359
+      },
+      {
+        "slug": "pain-management",
+        "nameKo": "통증의학과",
+        "count": 337
+      },
+      {
+        "slug": "advertising",
+        "nameKo": "광고",
+        "count": 295
+      },
+      {
+        "slug": "printing",
+        "nameKo": "인쇄",
+        "count": 293
+      },
+      {
+        "slug": "spa",
+        "nameKo": "스파",
+        "count": 287
+      },
+      {
+        "slug": "tax-preparer",
+        "nameKo": "세무사",
+        "count": 276
+      },
+      {
+        "slug": "electrical",
+        "nameKo": "전기",
+        "count": 273
+      },
+      {
+        "slug": "jewelry",
+        "nameKo": "보석",
+        "count": 261
+      },
+      {
+        "slug": "florist",
+        "nameKo": "꽃집",
+        "count": 247
+      },
+      {
+        "slug": "travel-agency",
+        "nameKo": "여행사",
+        "count": 242
+      },
+      {
+        "slug": "pharmacy",
+        "nameKo": "약국",
+        "count": 229
+      },
+      {
+        "slug": "media",
+        "nameKo": "언론",
+        "count": 225
+      },
+      {
+        "slug": "landscaping",
+        "nameKo": "조경",
+        "count": 220
+      },
+      {
+        "slug": "furniture",
+        "nameKo": "가구",
+        "count": 204
+      },
+      {
+        "slug": "photography",
+        "nameKo": "사진",
+        "count": 199
+      },
+      {
+        "slug": "signage",
+        "nameKo": "간판",
+        "count": 192
+      },
+      {
+        "slug": "senior-center",
+        "nameKo": "양로원",
+        "count": 174
+      },
+      {
+        "slug": "martial-arts",
+        "nameKo": "태권도",
+        "count": 168
+      },
+      {
+        "slug": "chinese-restaurant",
+        "nameKo": "중식",
+        "count": 168
+      },
+      {
+        "slug": "bakery",
+        "nameKo": "베이커리",
+        "count": 165
+      },
+      {
+        "slug": "plastic-surgery",
+        "nameKo": "성형외과",
+        "count": 159
+      },
+      {
+        "slug": "locksmith",
+        "nameKo": "열쇠",
+        "count": 155
+      },
+      {
+        "slug": "optical",
+        "nameKo": "안경",
+        "count": 151
+      },
+      {
+        "slug": "roofing",
+        "nameKo": "지붕",
+        "count": 138
+      },
+      {
+        "slug": "funeral",
+        "nameKo": "장례",
+        "count": 127
+      },
+      {
+        "slug": "music-school",
+        "nameKo": "음악학원",
+        "count": 118
+      },
+      {
+        "slug": "ophthalmology",
+        "nameKo": "안과",
+        "count": 99
+      },
+      {
+        "slug": "car-rental",
+        "nameKo": "렌터카",
+        "count": 99
+      },
+      {
+        "slug": "nightlife",
+        "nameKo": "유흥",
+        "count": 98
+      },
+      {
+        "slug": "obgyn",
+        "nameKo": "산부인과",
+        "count": 97
+      },
+      {
+        "slug": "tires",
+        "nameKo": "타이어",
+        "count": 95
+      }
+    ],
+    "koreadaily": [
+      {
+        "slug": "nightlife",
+        "nameKo": "유흥",
+        "count": 365
+      },
+      {
+        "slug": "health-supplements",
+        "nameKo": "건강식품",
+        "count": 88
+      },
+      {
+        "slug": "korean-medicine",
+        "nameKo": "한의원",
+        "count": 24
+      }
+    ],
+    "all": [
+      {
+        "slug": "organization",
+        "nameKo": "단체",
+        "count": 1898
+      },
+      {
+        "slug": "construction",
+        "nameKo": "건축",
+        "count": 1747
+      },
+      {
+        "slug": "korean-restaurant",
+        "nameKo": "한식",
+        "count": 1290
+      },
+      {
+        "slug": "church",
+        "nameKo": "교회",
+        "count": 1144
+      },
+      {
+        "slug": "grocery",
+        "nameKo": "마켓",
+        "count": 783
+      },
+      {
+        "slug": "cpa",
+        "nameKo": "공인회계사",
+        "count": 758
+      },
+      {
+        "slug": "auto-repair",
+        "nameKo": "자동차수리",
+        "count": 748
+      },
+      {
+        "slug": "western-restaurant",
+        "nameKo": "양식",
+        "count": 744
+      },
+      {
+        "slug": "hair-salon",
+        "nameKo": "미용실",
+        "count": 741
+      },
+      {
+        "slug": "car-dealer",
+        "nameKo": "자동차매매",
+        "count": 601
+      },
+      {
+        "slug": "mortgage-broker",
+        "nameKo": "모기지",
+        "count": 566
+      },
+      {
+        "slug": "electronics",
+        "nameKo": "전자제품",
+        "count": 556
+      },
+      {
+        "slug": "hvac",
+        "nameKo": "냉난방",
+        "count": 541
+      },
+      {
+        "slug": "japanese-restaurant",
+        "nameKo": "일식",
+        "count": 514
+      },
+      {
+        "slug": "bank",
+        "nameKo": "은행",
+        "count": 514
+      },
+      {
+        "slug": "moving",
+        "nameKo": "이삿짐",
+        "count": 490
+      },
+      {
+        "slug": "nightlife",
+        "nameKo": "유흥",
+        "count": 463
+      },
+      {
+        "slug": "internal-medicine",
+        "nameKo": "내과",
+        "count": 445
+      },
+      {
+        "slug": "skin-care",
+        "nameKo": "스킨케어",
+        "count": 444
+      },
+      {
+        "slug": "clothing",
+        "nameKo": "의류",
+        "count": 425
+      },
+      {
+        "slug": "notary",
+        "nameKo": "공증",
+        "count": 359
+      },
+      {
+        "slug": "pain-management",
+        "nameKo": "통증의학과",
+        "count": 337
+      },
+      {
+        "slug": "advertising",
+        "nameKo": "광고",
+        "count": 295
+      },
+      {
+        "slug": "printing",
+        "nameKo": "인쇄",
+        "count": 293
+      },
+      {
+        "slug": "spa",
+        "nameKo": "스파",
+        "count": 287
+      },
+      {
+        "slug": "tax-preparer",
+        "nameKo": "세무사",
+        "count": 276
+      },
+      {
+        "slug": "electrical",
+        "nameKo": "전기",
+        "count": 273
+      },
+      {
+        "slug": "jewelry",
+        "nameKo": "보석",
+        "count": 261
+      },
+      {
+        "slug": "florist",
+        "nameKo": "꽃집",
+        "count": 247
+      },
+      {
+        "slug": "travel-agency",
+        "nameKo": "여행사",
+        "count": 242
+      },
+      {
+        "slug": "pharmacy",
+        "nameKo": "약국",
+        "count": 229
+      },
+      {
+        "slug": "media",
+        "nameKo": "언론",
+        "count": 225
+      },
+      {
+        "slug": "landscaping",
+        "nameKo": "조경",
+        "count": 220
+      },
+      {
+        "slug": "furniture",
+        "nameKo": "가구",
+        "count": 204
+      },
+      {
+        "slug": "photography",
+        "nameKo": "사진",
+        "count": 199
+      },
+      {
+        "slug": "signage",
+        "nameKo": "간판",
+        "count": 192
+      },
+      {
+        "slug": "senior-center",
+        "nameKo": "양로원",
+        "count": 174
+      },
+      {
+        "slug": "martial-arts",
+        "nameKo": "태권도",
+        "count": 168
+      },
+      {
+        "slug": "chinese-restaurant",
+        "nameKo": "중식",
+        "count": 168
+      },
+      {
+        "slug": "bakery",
+        "nameKo": "베이커리",
+        "count": 165
+      },
+      {
+        "slug": "plastic-surgery",
+        "nameKo": "성형외과",
+        "count": 159
+      },
+      {
+        "slug": "locksmith",
+        "nameKo": "열쇠",
+        "count": 155
+      },
+      {
+        "slug": "optical",
+        "nameKo": "안경",
+        "count": 151
+      },
+      {
+        "slug": "roofing",
+        "nameKo": "지붕",
+        "count": 138
+      },
+      {
+        "slug": "funeral",
+        "nameKo": "장례",
+        "count": 127
+      },
+      {
+        "slug": "music-school",
+        "nameKo": "음악학원",
+        "count": 118
+      },
+      {
+        "slug": "ophthalmology",
+        "nameKo": "안과",
+        "count": 99
+      },
+      {
+        "slug": "car-rental",
+        "nameKo": "렌터카",
+        "count": 99
+      },
+      {
+        "slug": "obgyn",
+        "nameKo": "산부인과",
+        "count": 97
+      },
+      {
+        "slug": "tires",
+        "nameKo": "타이어",
+        "count": 95
+      }
+    ]
+  },
+  "spikes": []
+}

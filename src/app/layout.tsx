@@ -50,17 +50,20 @@ function Header() {
           한인맵
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm">
+          <Link href="/regions" className="text-gray-600 hover:text-gray-900">
+            전체 지역 (Regions)
+          </Link>
           <Link href="/ca/los-angeles/medical" className="text-gray-600 hover:text-gray-900">
-            Medical
+            병원 (Medical)
           </Link>
           <Link href="/ca/los-angeles/dental" className="text-gray-600 hover:text-gray-900">
-            Dental
+            치과 (Dental)
           </Link>
           <Link href="/ca/los-angeles/legal" className="text-gray-600 hover:text-gray-900">
-            Legal
+            법률 (Legal)
           </Link>
           <Link href="/ca/los-angeles/food" className="text-gray-600 hover:text-gray-900">
-            Dining
+            식당 (Dining)
           </Link>
         </nav>
       </div>
@@ -74,38 +77,41 @@ function Footer() {
       <div className="max-w-6xl mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-8">
           <div>
-            <h3 className="font-semibold text-gray-900 mb-3">한인맵</h3>
+            <h3 className="font-semibold text-gray-900 mb-3">한인맵 HaninMap</h3>
             <p className="text-sm text-gray-600">
+              미국 한인 업소를 쉽게 찾아보세요.
+              <br />
               Find Korean-speaking professionals and businesses in your area.
             </p>
           </div>
           <div>
-            <h4 className="font-medium text-gray-900 mb-3">Categories</h4>
+            <h4 className="font-medium text-gray-900 mb-3">카테고리 (Categories)</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/ca/los-angeles/medical" className="text-gray-600 hover:text-gray-900">Medical</Link></li>
-              <li><Link href="/ca/los-angeles/dental" className="text-gray-600 hover:text-gray-900">Dental</Link></li>
-              <li><Link href="/ca/los-angeles/legal" className="text-gray-600 hover:text-gray-900">Legal</Link></li>
-              <li><Link href="/ca/los-angeles/insurance" className="text-gray-600 hover:text-gray-900">Insurance</Link></li>
+              <li><Link href="/ca/los-angeles/medical" className="text-gray-600 hover:text-gray-900">병원 (Medical)</Link></li>
+              <li><Link href="/ca/los-angeles/dental" className="text-gray-600 hover:text-gray-900">치과 (Dental)</Link></li>
+              <li><Link href="/ca/los-angeles/legal" className="text-gray-600 hover:text-gray-900">법률 (Legal)</Link></li>
+              <li><Link href="/ca/los-angeles/insurance" className="text-gray-600 hover:text-gray-900">보험 (Insurance)</Link></li>
             </ul>
           </div>
           <div>
-            <h4 className="font-medium text-gray-900 mb-3">Popular Cities</h4>
+            <h4 className="font-medium text-gray-900 mb-3">인기 도시 (Popular Cities)</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/ca/los-angeles/medical" className="text-gray-600 hover:text-gray-900">Los Angeles</Link></li>
-              <li><Link href="/ca/irvine/medical" className="text-gray-600 hover:text-gray-900">Irvine</Link></li>
-              <li><Link href="/ca/garden-grove/medical" className="text-gray-600 hover:text-gray-900">Garden Grove</Link></li>
-              <li><Link href="/ca/fullerton/medical" className="text-gray-600 hover:text-gray-900">Fullerton</Link></li>
+              <li><Link href="/ca/los-angeles/medical" className="text-gray-600 hover:text-gray-900">Los Angeles (로스앤젤레스)</Link></li>
+              <li><Link href="/ca/irvine/medical" className="text-gray-600 hover:text-gray-900">Irvine (어바인)</Link></li>
+              <li><Link href="/ca/garden-grove/medical" className="text-gray-600 hover:text-gray-900">Garden Grove (가든그로브)</Link></li>
+              <li><Link href="/ca/fullerton/medical" className="text-gray-600 hover:text-gray-900">Fullerton (풀러튼)</Link></li>
             </ul>
           </div>
           <div>
-            <h4 className="font-medium text-gray-900 mb-3">Resources</h4>
+            <h4 className="font-medium text-gray-900 mb-3">바로가기 (Quick Links)</h4>
             <ul className="space-y-2 text-sm">
+              <li><Link href="/regions" className="text-gray-600 hover:text-gray-900">전체 지역 (All Regions)</Link></li>
               <li><Link href="/sitemap.xml" className="text-gray-600 hover:text-gray-900">Sitemap</Link></li>
             </ul>
           </div>
         </div>
         <div className="mt-8 pt-8 border-t border-gray-200 text-center text-sm text-gray-500">
-          © {new Date().getFullYear()} 한인맵. All rights reserved.
+          © {new Date().getFullYear()} 한인맵 HaninMap. All rights reserved.
         </div>
       </div>
     </footer>

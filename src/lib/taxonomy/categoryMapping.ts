@@ -1,12 +1,13 @@
 // Mapping from RadioKorea and KoreaDaily category codes to our taxonomy
 // Updated for RadioKorea v2 crawl (2024)
+// Updated 2026-01-29: B1-B6 taxonomy fixes
 
 // RadioKorea category code to our primary/subcategory mapping
 export const RADIOKOREA_MAPPING: Record<string, { primary: string; sub?: string }> = {
   // Medical - 병원
   'B08': { primary: 'medical', sub: 'internal-medicine' }, // 가정주치의
   'B09': { primary: 'medical' }, // 간호서비스/양로병원
-  'B10': { primary: 'medical', sub: 'ophthalmology' }, // 검안의
+  'B10': { primary: 'medical', sub: 'optometrist' }, // 검안의 [B1 FIX: was ophthalmology]
   'B11': { primary: 'medical', sub: 'internal-medicine' }, // 내과/위장내과/심장내과/류마티즘내과
   'B12': { primary: 'medical', sub: 'rehabilitation' }, // 물리치료
   'B13': { primary: 'medical', sub: 'podiatry' }, // 발전문의
@@ -69,8 +70,8 @@ export const RADIOKOREA_MAPPING: Record<string, { primary: string; sub?: string 
   'D05': { primary: 'food', sub: 'bakery' }, // 떡집/방앗간
   'M01': { primary: 'food', sub: 'grocery' }, // 마켓/식품점
   'S18': { primary: 'food', sub: 'grocery' }, // 식품도매
-  'N01': { primary: 'food' }, // 나이트클럽/캬바레/룸싸롱
-  'N03': { primary: 'food' }, // 노래방/가라오케
+  'N01': { primary: 'food', sub: 'nightlife' }, // 나이트클럽/캬바레/룸싸롱 [B5 FIX]
+  'N03': { primary: 'food', sub: 'nightlife' }, // 노래방/가라오케 [B5 FIX]
 
   // Beauty - 뷰티
   'M06': { primary: 'beauty', sub: 'hair-salon' }, // 미용실/메이크업
@@ -219,13 +220,13 @@ export const RADIOKOREA_MAPPING: Record<string, { primary: string; sub?: string 
   'Q06': { primary: 'financial' }, // 크레딧카드서비스
   'S01': { primary: 'professional' }, // 사무기기/복사기/계산기
   'S05': { primary: 'professional' }, // 상점장비/상점설비/플라스틱제품/컨벤션전시
-  'S07': { primary: 'professional' }, // 세탁소/세탁장비/옷수선
+  'S07': { primary: 'home-services', sub: 'laundry' }, // 세탁소/세탁장비/옷수선 [B3 FIX]
   'S08': { primary: 'professional' }, // 소방기구(판매/설비)/소화기
   'S16': { primary: 'shopping' }, // 식당용품
   'S17': { primary: 'shopping' }, // 식당장비/식당설비
   'S19': { primary: 'professional' }, // 실크스크린/티셔츠인쇄
   'S20': { primary: 'professional' }, // 심부름센터/메신저
-  'T01': { primary: 'home-services', sub: 'moving' }, // 택배/통신판매/우편속달
+  'T01': { primary: 'home-services', sub: 'shipping' }, // 택배/통신판매/우편속달 [B6 FIX]
   'T03': { primary: 'professional' }, // 트로피/감사패/상패/패넌트
 };
 

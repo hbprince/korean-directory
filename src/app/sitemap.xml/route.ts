@@ -60,6 +60,13 @@ export async function GET() {
       priority: '1.0',
     });
 
+    // Regions page
+    urls.push({
+      loc: `${BASE_URL}/regions`,
+      changefreq: 'weekly',
+      priority: '0.9',
+    });
+
     // Get all city/state/category combinations that have businesses
     const primaryCategoryCounts = await prisma.business.groupBy({
       by: ['city', 'state', 'primaryCategoryId'],
@@ -83,6 +90,9 @@ export async function GET() {
 
       // Skip if missing required fields
       if (!item.city || !item.state || !item.primaryCategoryId) continue;
+
+      // Skip "Unknown" cities
+      if (item.city.toLowerCase() === 'unknown') continue;
 
       const category = categoryMap.get(item.primaryCategoryId);
       if (!category || category.level !== 'primary' || !category.slug) continue;
@@ -115,6 +125,9 @@ export async function GET() {
 
       // Skip if missing required fields
       if (!item.subcategoryId || !item.city || !item.state) continue;
+
+      // Skip "Unknown" cities
+      if (item.city.toLowerCase() === 'unknown') continue;
 
       const category = categoryMap.get(item.subcategoryId);
       if (!category || category.level !== 'sub' || !category.slug) continue;

@@ -15,7 +15,12 @@
     "ingest": "npx tsx scripts/ingest.ts",
     "seed:enrich": "npx tsx scripts/seed-enrichment.ts",
     "audit:bilingual": "npx tsx scripts/audit-bilingual.ts",
-    "audit:seo": "npx tsx scripts/seoFinalAudit.ts"
+    "audit:seo": "npx tsx scripts/seoFinalAudit.ts",
+    "audit:category-distribution": "npx tsx scripts/audit-category-distribution.ts",
+    "audit:category-outliers": "npx tsx scripts/audit-category-outliers.ts",
+    "audit:all": "npm run audit:category-distribution && npm run audit:category-outliers",
+    "taxonomy:fix": "npx tsx scripts/taxonomy-fix.ts",
+    "taxonomy:remap": "npx tsx scripts/taxonomy-remap.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

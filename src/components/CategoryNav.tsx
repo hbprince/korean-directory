@@ -24,7 +24,7 @@ export function CategoryNav({
 
   return (
     <nav className="border-b border-gray-200 pb-4 mb-6">
-      {/* Primary Categories */}
+      {/* Primary Categories - Korean (English) format */}
       <div className="flex flex-wrap gap-2">
         {PRIMARY_CATEGORIES.map((category) => {
           const isActive = category.slug === activePrimarySlug;
@@ -38,13 +38,13 @@ export function CategoryNav({
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              {category.nameEn}
+              {category.nameKo} ({category.nameEn})
             </Link>
           );
         })}
       </div>
 
-      {/* Subcategories - show when we have an active primary category */}
+      {/* Subcategories - Korean (English) format */}
       {activePrimary && activePrimary.subcategories.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-100">
           {activePrimary.subcategories.map((sub) => {
@@ -59,7 +59,7 @@ export function CategoryNav({
                     : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
                 }`}
               >
-                {sub.nameEn}
+                {sub.nameKo} ({sub.nameEn})
               </Link>
             );
           })}
@@ -124,8 +124,8 @@ function CategorySidebarItem({
             : 'text-gray-700 hover:bg-gray-50'
         }`}
       >
-        <span className="mr-2">{category.nameKo}</span>
-        <span className="text-gray-500">{category.nameEn}</span>
+        <span className="mr-1">{category.nameKo}</span>
+        <span className="text-gray-500">({category.nameEn})</span>
       </Link>
 
       {(isActive || hasActiveSubcategory) && category.subcategories.length > 0 && (
@@ -140,7 +140,7 @@ function CategorySidebarItem({
                     : 'text-gray-600 hover:bg-gray-50'
                 }`}
               >
-                {sub.nameEn}
+                {sub.nameKo} ({sub.nameEn})
               </Link>
             </li>
           ))}
