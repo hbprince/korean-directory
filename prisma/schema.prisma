@@ -68,17 +68,25 @@ model GooglePlace {
   formattedAddress  String?
   lat               Float?
   lng               Float?
-  openingHoursText  Json?
+  openingHoursJson  Json?     // Full opening hours with periods
+  openingHoursText  Json?     // Weekday text array (legacy)
   types             Json?
   website           String?
   phoneE164         String?
+  photosJson        Json?     // Array of photo objects
+  googleMapsUrl     String?
+  editorialSummary  String?
   lastFetchedAt     DateTime
   fetchStatus       String    // 'ok' | 'error' | 'not_found'
+  matchMethod       String?   // 'phone' | 'address' | 'name' | 'imported'
+  matchConfidence   Float?    // 0.0 - 1.0
+  sourceId          String?   // Original ID from source (e.g., HaninDoc UUID)
 
   business          Business  @relation(fields: [businessId], references: [id])
 
   @@index([placeId])
   @@index([fetchStatus])
+  @@index([sourceId])
 }
 
 model EnrichmentQueue {

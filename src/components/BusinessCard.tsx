@@ -18,6 +18,8 @@ export interface BusinessCardProps {
   reviewCount?: number | null;
   categorySlug: string;
   categoryNameEn: string;
+  openNow?: boolean | null;
+  photoUrl?: string | null;
 }
 
 export function BusinessCard({
@@ -32,6 +34,8 @@ export function BusinessCard({
   rating,
   reviewCount,
   categoryNameEn,
+  openNow,
+  photoUrl,
 }: BusinessCardProps) {
   // Korean name as primary, English as secondary
   const displayName = formatBilingual(nameKo, nameEn);
@@ -47,38 +51,67 @@ export function BusinessCard({
   };
 
   return (
-    <article className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
-      <Link href={`/biz/${slug}`} className="block">
-        <h2 className="text-lg font-semibold text-gray-900 hover:text-blue-600">
-          {displayName}
-        </h2>
-      </Link>
-
-      <p className="text-sm text-gray-600 mt-2">{addressRaw}</p>
-
-      <div className="flex items-center justify-between mt-3">
-        <div className="flex items-center gap-3">
-          {rating !== null && rating !== undefined && reviewCount !== null && reviewCount !== undefined && (
-            <div className="flex items-center text-sm">
-              <span className="text-yellow-500 mr-1">★</span>
-              <span className="font-medium">{rating.toFixed(1)}</span>
-              <span className="text-gray-400 ml-1">({reviewCount} {UI_LABELS.reviews.ko})</span>
+    <article className="border border-gray-200 rounded-lg overflow-hidden hover:border-gray-300 transition-colors">
+      <div className="flex">
+        {/* Photo thumbnail */}
+        {photoUrl && (
+          <Link href={`/biz/${slug}`} className="flex-shrink-0">
+            <div className="w-24 h-24 bg-gray-100">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={photoUrl}
+                alt={displayName}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
             </div>
-          )}
-        </div>
-
-        {phoneRaw && (
-          <a
-            href={`tel:${phoneE164 || phoneRaw}`}
-            className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleCallClick();
-            }}
-          >
-            📞 {UI_LABELS.call.ko} ({UI_LABELS.call.en})
-          </a>
+          </Link>
         )}
+
+        <div className={`flex-1 p-4 ${photoUrl ? '' : ''}`}>
+          <Link href={`/biz/${slug}`} className="block">
+            <h2 className="text-lg font-semibold text-gray-900 hover:text-blue-600">
+              {displayName}
+            </h2>
+          </Link>
+
+          <p className="text-sm text-gray-600 mt-1 line-clamp-1">{addressRaw}</p>
+
+          <div className="flex items-center flex-wrap gap-2 mt-2">
+            {rating !== null && rating !== undefined && reviewCount !== null && reviewCount !== undefined && (
+              <div className="flex items-center text-sm">
+                <span className="text-yellow-500 mr-1">★</span>
+                <span className="font-medium">{rating.toFixed(1)}</span>
+                <span className="text-gray-400 ml-1">({reviewCount})</span>
+              </div>
+            )}
+
+            {openNow !== null && openNow !== undefined && (
+              <span className={`text-xs px-2 py-0.5 rounded-full ${
+                openNow
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-red-100 text-red-700'
+              }`}>
+                {openNow ? '영업중' : '영업종료'}
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center justify-end mt-2">
+            {phoneRaw && (
+              <a
+                href={`tel:${phoneE164 || phoneRaw}`}
+                className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCallClick();
+                }}
+              >
+                📞 {UI_LABELS.call.ko}
+              </a>
+            )}
+          </div>
+        </div>
       </div>
     </article>
   );

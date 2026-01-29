@@ -9,6 +9,7 @@ import {
   generateLocalBusinessSchema,
 } from '@/lib/seo/meta';
 import { formatBilingual, UI_LABELS } from '@/lib/i18n/labels';
+import { computeOpenNow } from '@/lib/enrichment/helpers';
 
 interface PageProps {
   params: Promise<{
@@ -22,7 +23,26 @@ async function getBusiness(slug: string) {
     include: {
       primaryCategory: true,
       subcategory: true,
-      googlePlace: true,
+      googlePlace: {
+        select: {
+          id: true,
+          placeId: true,
+          rating: true,
+          userRatingsTotal: true,
+          formattedAddress: true,
+          lat: true,
+          lng: true,
+          openingHoursJson: true,
+          openingHoursText: true,
+          website: true,
+          phoneE164: true,
+          photosJson: true,
+          googleMapsUrl: true,
+          editorialSummary: true,
+          lastFetchedAt: true,
+          fetchStatus: true,
+        },
+      },
     },
   });
 
@@ -131,8 +151,44 @@ export default async function BusinessPage({ params }: PageProps) {
                 </span>
               </div>
             )}
+            {(() => {
+              const openNow = computeOpenNow(googlePlace?.openingHoursJson);
+              if (openNow === null) return null;
+              return (
+                <span className={`text-sm px-3 py-1 rounded-full ${
+                  openNow
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-700'
+                }`}>
+                  {openNow ? '영업중 (Open)' : '영업종료 (Closed)'}
+                </span>
+              );
+            })()}
           </div>
         </header>
+
+        {/* Photo Gallery */}
+        {(() => {
+          const photos = googlePlace?.photosJson as Array<{ url: string; width: number; height: number }> | null;
+          if (!photos || photos.length === 0) return null;
+          return (
+            <section className="mb-8">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {photos.slice(0, 4).map((photo, idx) => (
+                  <div key={idx} className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={photo.url}
+                      alt={`${displayName} - 사진 ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                      loading={idx === 0 ? 'eager' : 'lazy'}
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+          );
+        })()}
 
         {/* Contact Information */}
         <section className="grid md:grid-cols-2 gap-8 mb-8">
@@ -222,6 +278,13 @@ export default async function BusinessPage({ params }: PageProps) {
         />
 
         <FAQSection faqs={faqs} />
+
+        {/* Last Updated */}
+        {googlePlace?.lastFetchedAt && (
+          <p className="text-xs text-gray-400 mt-8">
+            정보 업데이트: {new Date(googlePlace.lastFetchedAt).toLocaleDateString('ko-KR')}
+          </p>
+        )}
 
         {/* Related Businesses */}
         <RelatedBusinesses

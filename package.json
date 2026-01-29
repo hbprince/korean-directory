@@ -20,7 +20,9 @@
     "audit:category-outliers": "npx tsx scripts/audit-category-outliers.ts",
     "audit:all": "npm run audit:category-distribution && npm run audit:category-outliers",
     "taxonomy:fix": "npx tsx scripts/taxonomy-fix.ts",
-    "taxonomy:remap": "npx tsx scripts/taxonomy-remap.ts"
+    "taxonomy:remap": "npx tsx scripts/taxonomy-remap.ts",
+    "enrich:import-hanindoc": "npx tsx scripts/import-hanindoc-enrichment.ts",
+    "enrich:report": "npx tsx scripts/enrichment-report.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
