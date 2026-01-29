@@ -11,7 +11,7 @@ import {
 } from '@/lib/taxonomy/categories';
 import { generateL1Metadata, generateL2Metadata, generateItemListSchema } from '@/lib/seo/meta';
 import { getCityNameKo, getStateNameKo, UI_LABELS } from '@/lib/i18n/labels';
-import { computeOpenNow, getFirstPhotoUrl } from '@/lib/enrichment/helpers';
+import { computeOpenNow } from '@/lib/enrichment/helpers';
 
 const ITEMS_PER_PAGE = 20;
 const BASE_URL = 'https://www.haninmap.com';
@@ -148,7 +148,6 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
           rating: true,
           userRatingsTotal: true,
           openingHoursJson: true,
-          photosJson: true,
         },
       },
       primaryCategory: true,
@@ -252,7 +251,6 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
                   categorySlug={business.primaryCategory.slug}
                   categoryNameEn={business.primaryCategory.nameEn}
                   openNow={computeOpenNow(business.googlePlace?.openingHoursJson)}
-                  photoUrl={getFirstPhotoUrl(business.googlePlace?.photosJson)}
                 />
               ))}
             </div>
