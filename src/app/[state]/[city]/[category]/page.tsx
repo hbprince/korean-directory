@@ -153,7 +153,11 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
       },
       primaryCategory: true,
     },
-    orderBy: [{ qualityScore: 'desc' }, { nameKo: 'asc' }],
+    orderBy: [
+      { googlePlace: { rating: { sort: 'desc', nulls: 'last' } } }, // Enriched first
+      { qualityScore: 'desc' },
+      { nameKo: 'asc' },
+    ],
     skip: (page - 1) * ITEMS_PER_PAGE,
     take: ITEMS_PER_PAGE,
   });
