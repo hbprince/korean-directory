@@ -4,9 +4,14 @@ import Link from 'next/link';
 import prisma from '@/lib/db/prisma';
 import { FAQSection, generateBusinessFAQs } from '@/components/FAQSection';
 import { BusinessCTA } from '@/components/BusinessCTA';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { JsonLd } from '@/components/JsonLd';
 import {
   generateL3Metadata,
   generateLocalBusinessSchema,
+  buildBreadcrumbList,
+  buildFAQPageSchema,
+  buildBusinessBreadcrumbs,
 } from '@/lib/seo/meta';
 import { formatBilingual, UI_LABELS } from '@/lib/i18n/labels';
 import { computeOpenNow } from '@/lib/enrichment/helpers';
@@ -79,8 +84,12 @@ export default async function BusinessPage({ params }: PageProps) {
   const cityDisplay = toTitleCase(business.city);
   const googlePlace = business.googlePlace;
 
-  // Generate JSON-LD
-  const jsonLd = generateLocalBusinessSchema({
+  // First photo URL for schema image
+  const photos = googlePlace?.photosJson as Array<{ url: string; width: number; height: number }> | null;
+  const firstPhotoUrl = photos?.[0]?.url ?? null;
+
+  // Generate JSON-LD: LocalBusiness (enhanced)
+  const localBusinessJsonLd = generateLocalBusinessSchema({
     name: displayName,
     nameKo: business.nameKo,
     address: business.addressRaw,
@@ -95,7 +104,22 @@ export default async function BusinessPage({ params }: PageProps) {
     rating: googlePlace?.rating,
     reviewCount: googlePlace?.userRatingsTotal,
     slug: business.slug || '',
+    imageUrl: firstPhotoUrl,
+    googleMapsUrl: googlePlace?.googleMapsUrl,
+    openingHoursText: googlePlace?.openingHoursText as string[] | null,
   });
+
+  // Generate JSON-LD: BreadcrumbList
+  const breadcrumbItems = buildBusinessBreadcrumbs({
+    state: business.state,
+    city: business.city,
+    categoryNameEn: business.primaryCategory.nameEn,
+    categoryNameKo: business.primaryCategory.nameKo,
+    categorySlug: business.primaryCategory.slug,
+    businessName: displayName,
+    businessSlug: business.slug || '',
+  });
+  const breadcrumbJsonLd = buildBreadcrumbList(breadcrumbItems);
 
   // Generate FAQs
   const faqs = generateBusinessFAQs({
@@ -106,28 +130,18 @@ export default async function BusinessPage({ params }: PageProps) {
     hasRating: !!googlePlace?.rating,
   });
 
-  const categoryPath = `/${business.state.toLowerCase()}/${business.city.toLowerCase().replace(/\s+/g, '-')}/${business.primaryCategory.slug}`;
+  // Generate JSON-LD: FAQPage
+  const faqJsonLd = buildFAQPageSchema(faqs);
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={localBusinessJsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
+      <JsonLd data={faqJsonLd} />
 
       <main className="max-w-4xl mx-auto px-4 py-8">
-        {/* Breadcrumb */}
-        <nav className="text-sm text-gray-500 mb-6">
-          <Link href="/" className="hover:text-gray-700">
-            Home
-          </Link>
-          <span className="mx-2">/</span>
-          <Link href={categoryPath} className="hover:text-gray-700">
-            {business.primaryCategory.nameEn} in {cityDisplay}
-          </Link>
-          <span className="mx-2">/</span>
-          <span className="text-gray-700">{displayName}</span>
-        </nav>
+        {/* Breadcrumbs UI */}
+        <Breadcrumbs items={breadcrumbItems} />
 
         {/* Business Header */}
         <header className="border-b border-gray-200 pb-6 mb-6">
@@ -169,7 +183,6 @@ export default async function BusinessPage({ params }: PageProps) {
 
         {/* Photo Gallery */}
         {(() => {
-          const photos = googlePlace?.photosJson as Array<{ url: string; width: number; height: number }> | null;
           if (!photos || photos.length === 0) return null;
           return (
             <section className="mb-8">
@@ -253,14 +266,14 @@ export default async function BusinessPage({ params }: PageProps) {
             <h2 className="text-lg font-semibold mb-4">Location</h2>
             <div className="bg-gray-100 rounded-lg p-4 text-center">
               <a
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                href={googlePlace?.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
                   `${displayName} ${business.addressRaw}`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
               >
-                📍 View on Google Maps
+                View on Google Maps
               </a>
             </div>
           </section>

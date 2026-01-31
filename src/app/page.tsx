@@ -14,6 +14,11 @@ export const metadata: Metadata = {
     '한인 병원, 치과, 변호사, 식당 찾기. Find Korean-speaking doctors, dentists, lawyers, restaurants and more. 미국 한인 업소 디렉토리.',
   alternates: {
     canonical: BASE_URL,
+    languages: {
+      'ko': BASE_URL,
+      'en': BASE_URL,
+      'x-default': BASE_URL,
+    },
   },
   openGraph: {
     title: '한인맵 HaninMap | Korean Business Directory',

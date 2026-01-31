@@ -5,11 +5,21 @@ import { BusinessCard } from '@/components/BusinessCard';
 import { CategoryNav } from '@/components/CategoryNav';
 import { Pagination } from '@/components/Pagination';
 import { FAQSection, generateCategoryFAQs } from '@/components/FAQSection';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { CategoryIntro } from '@/components/CategoryIntro';
+import { JsonLd } from '@/components/JsonLd';
 import {
   isPrimaryCategory,
   isSubcategory,
 } from '@/lib/taxonomy/categories';
-import { generateL1Metadata, generateL2Metadata, generateItemListSchema } from '@/lib/seo/meta';
+import {
+  generateL1Metadata,
+  generateL2Metadata,
+  generateItemListSchema,
+  buildBreadcrumbList,
+  buildFAQPageSchema,
+  buildCategoryBreadcrumbs,
+} from '@/lib/seo/meta';
 import { getCityNameKo, getStateNameKo, UI_LABELS } from '@/lib/i18n/labels';
 import { computeOpenNow } from '@/lib/enrichment/helpers';
 
@@ -117,7 +127,6 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   const stateNormalized = state.toUpperCase();
 
   // Build where clause based on category type and city filter
-  // Exclude "Unknown" cities from results
   const baseWhere = {
     state: stateNormalized,
     city: isAllCities ? { not: 'Unknown' } : cityNormalized,
@@ -153,7 +162,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
       primaryCategory: true,
     },
     orderBy: [
-      { googlePlace: { rating: { sort: 'desc', nulls: 'last' } } }, // Enriched first
+      { googlePlace: { rating: { sort: 'desc', nulls: 'last' } } },
       { qualityScore: 'desc' },
       { nameKo: 'asc' },
     ],
@@ -166,16 +175,13 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   const cityKo = getCityNameKo(city);
   const stateDisplay = stateNormalized;
 
-  // Handle "all" city case
   const locationKo = isAllCities ? `${getStateNameKo(stateDisplay)} 전체` : cityKo;
   const locationEn = isAllCities ? `All of ${stateDisplay}` : `${cityDisplay}, ${stateDisplay}`;
 
-  // H1: Korean primary with English in parentheses
   const h1Title = `${locationKo} 한인 ${categoryInfo.nameKo} (${categoryInfo.nameEn} in ${locationEn})`;
-  // H2/subtitle: Additional context
   const koreanSubtitle = `한국어 상담 가능 | Korean-speaking ${categoryInfo.nameEn.toLowerCase()}`;
 
-  // Only generate FAQs if there are results
+  // FAQs
   const faqs = totalCount > 0 ? generateCategoryFAQs({
     categoryNameEn: categoryInfo.nameEn,
     categoryNameKo: categoryInfo.nameKo,
@@ -185,8 +191,8 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
     count: totalCount,
   }) : [];
 
-  // Generate JSON-LD
-  const jsonLd = generateItemListSchema(
+  // JSON-LD: ItemList
+  const itemListJsonLd = generateItemListSchema(
     businesses.map((biz, idx) => ({
       name: biz.nameEn || biz.nameKo,
       slug: biz.slug || `business-${biz.id}`,
@@ -195,16 +201,31 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
     `${BASE_URL}/${state}/${city}/${category}`
   );
 
+  // JSON-LD: BreadcrumbList
+  const breadcrumbItems = buildCategoryBreadcrumbs({
+    state,
+    city,
+    categoryNameEn: categoryInfo.nameEn,
+    categoryNameKo: categoryInfo.nameKo,
+    categorySlug: categoryInfo.slug,
+  });
+  const breadcrumbJsonLd = buildBreadcrumbList(breadcrumbItems);
+
+  // JSON-LD: FAQPage
+  const faqJsonLd = buildFAQPageSchema(faqs);
+
   const basePath = `/${state}/${city}/${category}`;
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={itemListJsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
+      <JsonLd data={faqJsonLd} />
 
       <main className="max-w-6xl mx-auto px-4 py-8">
+        {/* Breadcrumbs UI */}
+        <Breadcrumbs items={breadcrumbItems} />
+
         <CategoryNav
           currentState={state}
           currentCity={city}
@@ -221,7 +242,18 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
           </p>
         </header>
 
-        {/* City Filter - at the top for easy access */}
+        {/* Category Intro (unique content block) */}
+        {totalCount > 0 && page === 1 && (
+          <CategoryIntro
+            city={city}
+            state={state}
+            categoryNameEn={categoryInfo.nameEn}
+            categoryNameKo={categoryInfo.nameKo}
+            count={totalCount}
+          />
+        )}
+
+        {/* City Filter */}
         <CityFilter state={state} currentCity={city} category={category} />
 
         {businesses.length === 0 ? (
@@ -281,7 +313,6 @@ async function CityFilter({
   const cityNormalized = currentCity.toUpperCase().replace(/-/g, ' ');
   const isAllCities = currentCity === 'all';
 
-  // Get all cities with businesses in this category, excluding Unknown
   const cities = await prisma.business.groupBy({
     by: ['city'],
     where: {
@@ -297,7 +328,6 @@ async function CityFilter({
     take: 20,
   });
 
-  // Get total count for "All" option
   const totalCount = await prisma.business.count({
     where: {
       state: state.toUpperCase(),
@@ -321,7 +351,6 @@ async function CityFilter({
         <span className="text-sm font-medium text-gray-700">지역 선택 (Select City)</span>
       </div>
       <div className="flex flex-wrap gap-2">
-        {/* "All" option first */}
         <a
           href={`/${state}/all/${category}`}
           className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
@@ -334,9 +363,7 @@ async function CityFilter({
           <span className="ml-1 opacity-70">({totalCount.toLocaleString()})</span>
         </a>
 
-        {/* City chips - Korean (English) format */}
         {cities.map((c) => {
-          // Skip Unknown cities
           if (c.city.toLowerCase() === 'unknown') return null;
 
           const citySlug = c.city.toLowerCase().replace(/\s+/g, '-');
@@ -344,7 +371,6 @@ async function CityFilter({
           const cityEn = toTitleCase(c.city);
           const isCurrentCity = c.city === cityNormalized;
 
-          // Format: 한글 (English) or just English if no Korean mapping
           const displayName = cityKo !== cityEn ? `${cityKo} (${cityEn})` : cityEn;
 
           return (

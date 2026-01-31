@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   },
   description:
     'Find Korean-speaking doctors, dentists, lawyers, restaurants, and more. The most comprehensive directory of Korean businesses.',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.haninmap.com'),
 };
 
 export default function RootLayout({
