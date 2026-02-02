@@ -19,6 +19,7 @@ model Business {
   city              String
   state             String        @default("CA")
   zip               String?
+  countryCode       String        @default("US")
   lat               Float?
   lng               Float?
   primaryCategoryId Int
@@ -40,6 +41,7 @@ model Business {
   @@index([dedupeClusterId])
   @@index([phoneE164])
   @@index([slug])
+  @@index([countryCode])
 }
 
 model Category {
@@ -120,4 +122,116 @@ model PageMetric {
   updatedAt   DateTime  @updatedAt
 
   @@index([last30dUv])
+}
+
+// === Promotion tracking ===
+
+model PromotionRun {
+  id              Int       @id @default(autoincrement())
+  countryCode     String
+  status          String    @default("running") // running | completed | failed
+  startedAt       DateTime  @default(now())
+  completedAt     DateTime?
+  totalProcessed  Int       @default(0)
+  totalPromoted   Int       @default(0)
+  totalSkipped    Int       @default(0)
+  totalErrors     Int       @default(0)
+  skippedSample   Json?     // first 20 skipped records with reasons
+  errorLog        String?
+
+  @@index([countryCode])
+}
+
+// === Staging tables for multi-country crawl pipeline ===
+
+model CrawlRun {
+  id               Int       @id @default(autoincrement())
+  countryCode      String    // CA, JP, AU
+  sourceName       String    // e.g. "koreaportal-toronto"
+  status           String    @default("running") // running | completed | failed
+  startedAt        DateTime  @default(now())
+  completedAt      DateTime?
+  totalScraped     Int       @default(0)
+  totalNormalized  Int       @default(0)
+  totalDeduped     Int       @default(0)
+  totalErrors      Int       @default(0)
+  errorLog         String?
+
+  rawBusinesses    RawBusiness[]
+
+  @@index([countryCode])
+  @@index([status])
+}
+
+model RawBusiness {
+  id             Int       @id @default(autoincrement())
+  countryCode    String    // CA, JP, AU
+  sourceName     String    // e.g. "koreaportal-toronto"
+  sourceUid      String    // unique ID from source site
+  crawlRunId     Int
+  status         String    @default("pending") // pending | normalized | deduped | promoted | error
+
+  rawNameKo      String?
+  rawNameEn      String?
+  rawPhone       String?
+  rawAddress     String?
+  rawCity        String?
+  rawRegion      String?   // province / prefecture / state
+  rawPostalCode  String?
+  rawCategory    String?
+  rawSubcategory String?
+  rawWebsite     String?
+  rawEmail       String?
+  rawLat         Float?
+  rawLng         Float?
+  rawPayload     Json?     // full original data
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  crawlRun       CrawlRun  @relation(fields: [crawlRunId], references: [id])
+
+  @@unique([sourceName, sourceUid])
+  @@index([countryCode])
+  @@index([status])
+  @@index([crawlRunId])
+}
+
+model StagedBusiness {
+  id               Int       @id @default(autoincrement())
+  countryCode      String    // CA, JP, AU
+  sourceName       String
+  sourceUid        String
+  rawBusinessId    Int?
+
+  nameKo           String?
+  nameEn           String?
+  phoneE164        String?
+  phoneRaw         String?
+  addressRaw       String?
+  addressNorm      String?
+  city             String?
+  region           String?   // province (CA), prefecture (JP), state (AU)
+  postalCode       String?
+  lat              Float?
+  lng              Float?
+
+  primaryCategory  String?   // slug matching existing taxonomy
+  subcategory      String?   // slug matching existing taxonomy
+  website          String?
+  email            String?
+
+  dedupeClusterId  Int?
+  dedupeStatus     String    @default("pending") // pending | unique | duplicate | master
+  promotionStatus  String    @default("pending") // pending | promoted | skipped
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([sourceName, sourceUid])
+  @@index([countryCode])
+  @@index([dedupeClusterId])
+  @@index([dedupeStatus])
+  @@index([promotionStatus])
+  @@index([phoneE164])
 }

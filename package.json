@@ -22,7 +22,12 @@
     "taxonomy:fix": "npx tsx scripts/taxonomy-fix.ts",
     "taxonomy:remap": "npx tsx scripts/taxonomy-remap.ts",
     "enrich:import-hanindoc": "npx tsx scripts/import-hanindoc-enrichment.ts",
-    "enrich:report": "npx tsx scripts/enrichment-report.ts"
+    "enrich:report": "npx tsx scripts/enrichment-report.ts",
+    "crawl:ca": "npx tsx scripts/crawl-ca.ts",
+    "crawl:au": "npx tsx scripts/crawl-au.ts",
+    "promote:ca": "npx tsx scripts/promote-ca.ts",
+    "promote:au": "npx tsx scripts/promote-au.ts",
+    "promote:all": "npm run promote:ca && npm run promote:au"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
@@ -32,9 +37,11 @@
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@types/cheerio": "^0.22.35",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "cheerio": "^1.2.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
     "postcss": "^8",

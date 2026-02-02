@@ -100,7 +100,17 @@ export function namesSimilar(name1: string, name2: string, threshold = 0.9): boo
 }
 
 export interface SourceKey {
-  source: 'radiokorea' | 'koreadaily';
+  source:
+    | 'radiokorea'
+    | 'koreadaily'
+    | 'koreatimes-ca'
+    | 'bd-cktimes'
+    | 'vanchosun'
+    | 'missycanada'
+    | 'ikoreatown-au'
+    | 'woorimelbourne'
+    | 'kcmweekly'
+    | 'mokorea';
   uid: string;
 }
 

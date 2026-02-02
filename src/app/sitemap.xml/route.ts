@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db/prisma';
+import { getAllCountries } from '@/lib/i18n/countries';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -67,12 +68,6 @@ export async function GET() {
       priority: '0.9',
     });
 
-    // Get all city/state/category combinations that have businesses
-    const primaryCategoryCounts = await prisma.business.groupBy({
-      by: ['city', 'state', 'primaryCategoryId'],
-      _count: true,
-    });
-
     // Get category slugs
     const categories = await prisma.category.findMany({
       select: { id: true, slug: true, level: true },
@@ -83,15 +78,18 @@ export async function GET() {
     const addedUrls = new Set<string>();
     addedUrls.add(BASE_URL);
 
+    // ─── US pages (existing, countryCode = 'US') ───
+
+    const usPrimaryCategoryCounts = await prisma.business.groupBy({
+      by: ['city', 'state', 'primaryCategoryId'],
+      _count: { _all: true },
+      where: { countryCode: 'US' },
+    });
+
     // L1 pages (primary categories with results > 0)
-    for (const item of primaryCategoryCounts) {
-      // Skip if no results
-      if (!item._count || item._count === 0) continue;
-
-      // Skip if missing required fields
+    for (const item of usPrimaryCategoryCounts) {
+      if (!item._count._all) continue;
       if (!item.city || !item.state || !item.primaryCategoryId) continue;
-
-      // Skip "Unknown" cities
       if (item.city.toLowerCase() === 'unknown') continue;
 
       const category = categoryMap.get(item.primaryCategoryId);
@@ -110,23 +108,19 @@ export async function GET() {
       }
     }
 
-    // L2: Subcategories with results
-    const subcategoryCounts = await prisma.business.groupBy({
+    // L2: US Subcategories with results
+    const usSubcategoryCounts = await prisma.business.groupBy({
       by: ['city', 'state', 'subcategoryId'],
-      _count: true,
+      _count: { _all: true },
       where: {
+        countryCode: 'US',
         subcategoryId: { not: null },
       },
     });
 
-    for (const item of subcategoryCounts) {
-      // Skip if no results
-      if (!item._count || item._count === 0) continue;
-
-      // Skip if missing required fields
+    for (const item of usSubcategoryCounts) {
+      if (!item._count._all) continue;
       if (!item.subcategoryId || !item.city || !item.state) continue;
-
-      // Skip "Unknown" cities
       if (item.city.toLowerCase() === 'unknown') continue;
 
       const category = categoryMap.get(item.subcategoryId);
@@ -145,7 +139,73 @@ export async function GET() {
       }
     }
 
-    // L3 pages (only indexable businesses with valid slugs)
+    // ─── International pages ───
+
+    const intlCountries = getAllCountries();
+
+    for (const countryConfig of intlCountries) {
+      const intlPrimaryCounts = await prisma.business.groupBy({
+        by: ['city', 'state', 'primaryCategoryId'],
+        _count: { _all: true },
+        where: { countryCode: countryConfig.code },
+      });
+
+      for (const item of intlPrimaryCounts) {
+        if (!item._count._all) continue;
+        if (!item.city || !item.state || !item.primaryCategoryId) continue;
+        if (item.city.toLowerCase() === 'unknown') continue;
+
+        const category = categoryMap.get(item.primaryCategoryId);
+        if (!category || category.level !== 'primary' || !category.slug) continue;
+
+        // International URL: /{countrySlug}/{region}/{city}/{category}
+        const url = buildUrl(countryConfig.slug, item.state, item.city, category.slug);
+        if (!url) continue;
+
+        if (!addedUrls.has(url)) {
+          addedUrls.add(url);
+          urls.push({
+            loc: url,
+            changefreq: 'weekly',
+            priority: '0.7',
+          });
+        }
+      }
+
+      // International subcategories
+      const intlSubCounts = await prisma.business.groupBy({
+        by: ['city', 'state', 'subcategoryId'],
+        _count: { _all: true },
+        where: {
+          countryCode: countryConfig.code,
+          subcategoryId: { not: null },
+        },
+      });
+
+      for (const item of intlSubCounts) {
+        if (!item._count._all) continue;
+        if (!item.subcategoryId || !item.city || !item.state) continue;
+        if (item.city.toLowerCase() === 'unknown') continue;
+
+        const category = categoryMap.get(item.subcategoryId);
+        if (!category || category.level !== 'sub' || !category.slug) continue;
+
+        const url = buildUrl(countryConfig.slug, item.state, item.city, category.slug);
+        if (!url) continue;
+
+        if (!addedUrls.has(url)) {
+          addedUrls.add(url);
+          urls.push({
+            loc: url,
+            changefreq: 'weekly',
+            priority: '0.6',
+          });
+        }
+      }
+    }
+
+    // ─── L3 pages (all countries - slugs are globally unique) ───
+
     const indexableBusinesses = await prisma.business.findMany({
       where: {
         slug: { not: null },

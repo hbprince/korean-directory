@@ -14,6 +14,7 @@ import {
   buildBusinessBreadcrumbs,
 } from '@/lib/seo/meta';
 import { formatBilingual, UI_LABELS } from '@/lib/i18n/labels';
+import { getCountryByCode, getIntlRegionNameEn } from '@/lib/i18n/countries';
 import { computeOpenNow } from '@/lib/enrichment/helpers';
 
 interface PageProps {
@@ -88,6 +89,10 @@ export default async function BusinessPage({ params }: PageProps) {
   const photos = googlePlace?.photosJson as Array<{ url: string; width: number; height: number }> | null;
   const firstPhotoUrl = photos?.[0]?.url ?? null;
 
+  // Country-aware data
+  const countryConfig = getCountryByCode(business.countryCode ?? 'US');
+  const isInternational = !!countryConfig;
+
   // Generate JSON-LD: LocalBusiness (enhanced)
   const localBusinessJsonLd = generateLocalBusinessSchema({
     name: displayName,
@@ -107,18 +112,28 @@ export default async function BusinessPage({ params }: PageProps) {
     imageUrl: firstPhotoUrl,
     googleMapsUrl: googlePlace?.googleMapsUrl,
     openingHoursText: googlePlace?.openingHoursText as string[] | null,
+    addressCountry: countryConfig?.addressCountry ?? 'US',
   });
 
-  // Generate JSON-LD: BreadcrumbList
-  const breadcrumbItems = buildBusinessBreadcrumbs({
-    state: business.state,
-    city: business.city,
-    categoryNameEn: business.primaryCategory.nameEn,
-    categoryNameKo: business.primaryCategory.nameKo,
-    categorySlug: business.primaryCategory.slug,
-    businessName: displayName,
-    businessSlug: business.slug || '',
-  });
+  const breadcrumbItems = isInternational
+    ? [
+        { name: '홈 (Home)', url: 'https://www.haninmap.com' },
+        { name: `${countryConfig.nameKo} (${countryConfig.nameEn})`, url: 'https://www.haninmap.com/regions' },
+        { name: `${getIntlRegionNameEn(business.state, countryConfig.slug)} (${business.state})`,
+          url: `https://www.haninmap.com/${countryConfig.slug}/${business.state.toLowerCase()}/all/${business.primaryCategory.slug}` },
+        { name: `${business.primaryCategory.nameKo} (${business.primaryCategory.nameEn})`,
+          url: `https://www.haninmap.com/${countryConfig.slug}/${business.state.toLowerCase()}/${business.city.toLowerCase().replace(/\s+/g, '-')}/${business.primaryCategory.slug}` },
+        { name: displayName, url: `https://www.haninmap.com/biz/${business.slug || ''}` },
+      ]
+    : buildBusinessBreadcrumbs({
+        state: business.state,
+        city: business.city,
+        categoryNameEn: business.primaryCategory.nameEn,
+        categoryNameKo: business.primaryCategory.nameKo,
+        categorySlug: business.primaryCategory.slug,
+        businessName: displayName,
+        businessSlug: business.slug || '',
+      });
   const breadcrumbJsonLd = buildBreadcrumbList(breadcrumbItems);
 
   // Generate FAQs

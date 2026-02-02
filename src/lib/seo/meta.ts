@@ -232,6 +232,7 @@ export function generateLocalBusinessSchema(business: {
   imageUrl?: string | null;
   googleMapsUrl?: string | null;
   openingHoursText?: string[] | null;
+  addressCountry?: string;
 }) {
   const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
@@ -244,7 +245,7 @@ export function generateLocalBusinessSchema(business: {
       addressLocality: business.city,
       addressRegion: business.state,
       postalCode: business.zip || undefined,
-      addressCountry: 'US',
+      addressCountry: business.addressCountry ?? 'US',
     },
     url: `${BASE_URL}/biz/${business.slug}`,
   };

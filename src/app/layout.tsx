@@ -56,14 +56,14 @@ function Header() {
           <Link href="/ca/los-angeles/medical" className="text-gray-600 hover:text-gray-900">
             병원 (Medical)
           </Link>
-          <Link href="/ca/los-angeles/dental" className="text-gray-600 hover:text-gray-900">
-            치과 (Dental)
-          </Link>
-          <Link href="/ca/los-angeles/legal" className="text-gray-600 hover:text-gray-900">
-            법률 (Legal)
-          </Link>
           <Link href="/ca/los-angeles/food" className="text-gray-600 hover:text-gray-900">
             식당 (Dining)
+          </Link>
+          <Link href="/canada/on/toronto/medical" className="text-gray-600 hover:text-gray-900">
+            캐나다 (Canada)
+          </Link>
+          <Link href="/australia/nsw/sydney/medical" className="text-gray-600 hover:text-gray-900">
+            호주 (Australia)
           </Link>
         </nav>
       </div>
@@ -79,9 +79,9 @@ function Footer() {
           <div>
             <h3 className="font-semibold text-gray-900 mb-3">한인맵 HaninMap</h3>
             <p className="text-sm text-gray-600">
-              미국 한인 업소를 쉽게 찾아보세요.
+              미국, 캐나다, 호주 한인 업소를 쉽게 찾아보세요.
               <br />
-              Find Korean-speaking professionals and businesses in your area.
+              Find Korean-speaking professionals and businesses worldwide.
             </p>
           </div>
           <div>
@@ -98,8 +98,8 @@ function Footer() {
             <ul className="space-y-2 text-sm">
               <li><Link href="/ca/los-angeles/medical" className="text-gray-600 hover:text-gray-900">Los Angeles (로스앤젤레스)</Link></li>
               <li><Link href="/ca/irvine/medical" className="text-gray-600 hover:text-gray-900">Irvine (어바인)</Link></li>
-              <li><Link href="/ca/garden-grove/medical" className="text-gray-600 hover:text-gray-900">Garden Grove (가든그로브)</Link></li>
-              <li><Link href="/ca/fullerton/medical" className="text-gray-600 hover:text-gray-900">Fullerton (풀러튼)</Link></li>
+              <li><Link href="/canada/on/toronto/medical" className="text-gray-600 hover:text-gray-900">Toronto (토론토)</Link></li>
+              <li><Link href="/australia/nsw/sydney/medical" className="text-gray-600 hover:text-gray-900">Sydney (시드니)</Link></li>
             </ul>
           </div>
           <div>

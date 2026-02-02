@@ -7,6 +7,7 @@ interface CategoryNavProps {
   currentCategory?: string;
   currentSubcategory?: string;
   parentCategorySlug?: string;
+  countrySlug?: string;
 }
 
 export function CategoryNav({
@@ -15,12 +16,18 @@ export function CategoryNav({
   currentCategory,
   currentSubcategory,
   parentCategorySlug,
+  countrySlug,
 }: CategoryNavProps) {
   // Find the active primary category (either current or parent of current subcategory)
   const activePrimarySlug = parentCategorySlug || currentCategory;
   const activePrimary = PRIMARY_CATEGORIES.find(
     (c) => c.slug === activePrimarySlug
   );
+
+  // Build URL prefix: international uses /{country}/{region}/{city}, US uses /{state}/{city}
+  const pathPrefix = countrySlug
+    ? `/${countrySlug}/${currentState}/${currentCity}`
+    : `/${currentState}/${currentCity}`;
 
   return (
     <nav className="border-b border-gray-200 pb-4 mb-6">
@@ -31,7 +38,7 @@ export function CategoryNav({
           return (
             <Link
               key={category.slug}
-              href={`/${currentState}/${currentCity}/${category.slug}`}
+              href={`${pathPrefix}/${category.slug}`}
               className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
                 isActive
                   ? 'bg-blue-600 text-white'
@@ -52,7 +59,7 @@ export function CategoryNav({
             return (
               <Link
                 key={sub.slug}
-                href={`/${currentState}/${currentCity}/${sub.slug}`}
+                href={`${pathPrefix}/${sub.slug}`}
                 className={`px-2 py-1 text-xs rounded transition-colors ${
                   isActiveSub
                     ? 'bg-blue-100 text-blue-700 font-medium'
