@@ -252,7 +252,10 @@ export default async function BusinessPage({ params }: PageProps) {
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800"
                     >
-                      {new URL(googlePlace.website).hostname}
+                      {(() => {
+                        try { return new URL(googlePlace.website).hostname; }
+                        catch { return googlePlace.website; }
+                      })()}
                     </a>
                   </dd>
                 </div>

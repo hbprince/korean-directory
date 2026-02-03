@@ -144,6 +144,10 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
 
   // Get total count
   const totalCount = await prisma.business.count({ where: whereClause });
+
+  // 404 for empty categories — prevents noindex pages
+  if (totalCount === 0) notFound();
+
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
   if (page > totalPages && totalPages > 0) notFound();

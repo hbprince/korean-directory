@@ -91,13 +91,12 @@ export async function generateIntlMetadata(
     ? `${countryConfig.nameKo} ${cityKo} 한인 ${categoryInfo.nameKo} ${count}곳. Korean ${categoryInfo.nameEn.toLowerCase()} in ${cityDisplay}, ${countryConfig.nameEn}. 전화번호, 주소, 평점.`
     : `${countryConfig.nameKo} ${cityKo} 한인 ${categoryInfo.nameKo}. Find Korean ${categoryInfo.nameEn.toLowerCase()} in ${cityDisplay}, ${countryConfig.nameEn}.`;
 
-  const robots = count === 0 ? 'noindex,follow' : 'index,follow';
   const url = `${BASE_URL}/${countrySlug}/${region}/${city}/${category}`;
 
   return {
     title,
     description,
-    robots,
+    robots: 'index,follow',
     openGraph: {
       title,
       description,
@@ -152,6 +151,10 @@ export async function InternationalCategoryPage({
     : { ...baseWhere, subcategory: { slug: category } };
 
   const totalCount = await prisma.business.count({ where: whereClause });
+
+  // 404 for empty categories — prevents noindex pages
+  if (totalCount === 0) notFound();
+
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
   if (pageNum > totalPages && totalPages > 0) notFound();

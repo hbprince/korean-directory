@@ -27,7 +27,8 @@
     "crawl:au": "npx tsx scripts/crawl-au.ts",
     "promote:ca": "npx tsx scripts/promote-ca.ts",
     "promote:au": "npx tsx scripts/promote-au.ts",
-    "promote:all": "npm run promote:ca && npm run promote:au"
+    "promote:all": "npm run promote:ca && npm run promote:au",
+    "seo:audit": "npx tsx scripts/seo/audit-indexing.ts --base=${BASE_URL:-https://www.haninmap.com} --pathsFromSitemap=true --sample=300"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

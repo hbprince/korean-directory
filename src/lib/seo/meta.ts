@@ -54,14 +54,13 @@ export function generateL1Metadata(params: {
     ? `${cityKo} 한인 ${categoryNameKo} ${count}곳. Korean ${categoryNameEn.toLowerCase()} in ${cityDisplay}, ${stateDisplay}. 전화번호, 주소, 평점, 리뷰.`
     : `${cityKo} 한인 ${categoryNameKo}. Find Korean ${categoryNameEn.toLowerCase()} in ${cityDisplay}, ${stateDisplay}.`;
 
-  const robots = count === 0 ? 'noindex,follow' : 'index,follow';
   const slug = categorySlug || categoryNameEn.toLowerCase().replace(/\s+/g, '-');
   const url = canonicalUrl(state, city, slug);
 
   return {
     title,
     description,
-    robots,
+    robots: 'index,follow',
     openGraph: {
       title,
       description,
@@ -95,14 +94,13 @@ export function generateL2Metadata(params: {
     ? `${cityKo} 한인 ${subcategoryNameKo} ${count}곳. Korean ${subcategoryNameEn.toLowerCase()} in ${cityDisplay}, ${stateDisplay}. 전화번호, 주소, 평점.`
     : `${cityKo} 한인 ${subcategoryNameKo}. Find Korean ${subcategoryNameEn.toLowerCase()} in ${cityDisplay}, ${stateDisplay}.`;
 
-  const robots = count === 0 ? 'noindex,follow' : 'index,follow';
   const slug = subcategorySlug || subcategoryNameEn.toLowerCase().replace(/\s+/g, '-');
   const url = canonicalUrl(state, city, slug);
 
   return {
     title,
     description,
-    robots,
+    robots: 'index,follow',
     openGraph: {
       title,
       description,
@@ -139,13 +137,12 @@ export function generateL3Metadata(params: {
   }
   description += ` 전화번호, 주소, 영업시간 안내.`;
 
-  const shouldIndex = shouldIndexL3({ hasGooglePlace, rating, reviewCount });
   const url = `${BASE_URL}/biz/${slug}`;
 
   return {
     title,
     description,
-    robots: shouldIndex ? 'index,follow' : 'noindex,follow',
+    robots: 'index,follow',
     openGraph: {
       title,
       description,
