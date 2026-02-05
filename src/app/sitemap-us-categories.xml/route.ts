@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db/prisma';
 import {
-  normalizeSlug,
   isMalformedCity,
   buildValidUrl,
 } from '@/lib/seo/slug-utils';
