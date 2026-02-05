@@ -31,6 +31,10 @@ function hreflangAlternates(url: string) {
   };
 }
 
+// Minimum business count for a category page to be indexed
+// Pages with fewer listings are considered "thin content" and should be noindex
+const MIN_LISTINGS_FOR_INDEX = 3;
+
 // ─── L1 Metadata (primary category pages) ──────────────────────────
 
 export function generateL1Metadata(params: {
@@ -57,10 +61,13 @@ export function generateL1Metadata(params: {
   const slug = categorySlug || categoryNameEn.toLowerCase().replace(/\s+/g, '-');
   const url = canonicalUrl(state, city, slug);
 
+  // noindex thin content pages (fewer than MIN_LISTINGS_FOR_INDEX businesses)
+  const robots = count >= MIN_LISTINGS_FOR_INDEX ? 'index,follow' : 'noindex,follow';
+
   return {
     title,
     description,
-    robots: 'index,follow',
+    robots,
     openGraph: {
       title,
       description,
@@ -97,10 +104,13 @@ export function generateL2Metadata(params: {
   const slug = subcategorySlug || subcategoryNameEn.toLowerCase().replace(/\s+/g, '-');
   const url = canonicalUrl(state, city, slug);
 
+  // noindex thin content pages (fewer than MIN_LISTINGS_FOR_INDEX businesses)
+  const robots = count >= MIN_LISTINGS_FOR_INDEX ? 'index,follow' : 'noindex,follow';
+
   return {
     title,
     description,
-    robots: 'index,follow',
+    robots,
     openGraph: {
       title,
       description,
@@ -139,10 +149,15 @@ export function generateL3Metadata(params: {
 
   const url = `${BASE_URL}/biz/${slug}`;
 
+  // Only index high-quality pages (rating >= 4.2, reviews >= 10)
+  // Low-quality pages are still accessible but not indexed to prevent thin content issues
+  const shouldIndex = shouldIndexL3({ hasGooglePlace, rating, reviewCount });
+  const robots = shouldIndex ? 'index,follow' : 'noindex,follow';
+
   return {
     title,
     description,
-    robots: 'index,follow',
+    robots,
     openGraph: {
       title,
       description,
