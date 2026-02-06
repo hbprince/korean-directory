@@ -27,7 +27,7 @@ export const RADIOKOREA_MAPPING: Record<string, { primary: string; sub?: string 
   'B27': { primary: 'medical' }, // 임상심리과
   'B28': { primary: 'medical', sub: 'pain-management' }, // 재활의학과/통증치료
   'B29': { primary: 'medical', sub: 'orthopedics' }, // 정형외과
-  'B30': { primary: 'medical' }, // 종합병원
+  'B30': { primary: 'medical', sub: 'general-hospital' }, // 종합병원
   'B31': { primary: 'medical', sub: 'pain-management' }, // 척추신경과
   'B32': { primary: 'medical', sub: 'dermatology' }, // 피부과
   'B33': { primary: 'medical', sub: 'pulmonology' }, // 호흡기과
@@ -35,7 +35,7 @@ export const RADIOKOREA_MAPPING: Record<string, { primary: string; sub?: string 
   'A07': { primary: 'medical', sub: 'pharmacy' }, // 약국
 
   // Dental - 치과
-  'B34': { primary: 'dental' }, // 일반치과
+  'B34': { primary: 'dental', sub: 'general-dentist' }, // 일반치과
   'B35': { primary: 'dental', sub: 'orthodontist' }, // 교정치과
   'B36': { primary: 'dental', sub: 'prosthodontist' }, // 보철치과
   'B37': { primary: 'dental', sub: 'pediatric-dentist' }, // 소아치과
@@ -259,35 +259,142 @@ export const KOREADAILY_PRIMARY_MAPPING: Record<number, string> = {
   28: 'community',      // 단체/기관
 };
 
-// KoreaDaily sub_idx to our subcategory mapping (by primary category)
+// KoreaDaily sub_idx to our subcategory mapping
+// Keys are '{category_id}-{sub_idx}' from scraped_koreadaily_yp_complete.json
 export const KOREADAILY_SUB_MAPPING: Record<string, string> = {
-  // Food (category_id: 5)
-  '5-13': 'korean-bbq',      // BBQ
-  '5-14': 'korean-restaurant', // 한식
-  '5-15': 'japanese-restaurant', // 일식
-  '5-16': 'chinese-restaurant', // 중식
-  '5-17': 'snack-bar',       // 분식
-  '5-18': 'bakery',          // 베이커리
-  '5-19': 'cafe',            // 카페
+  // Cat 5: 식당 → food
+  '5-8': 'western-restaurant',   // 외국식당
+  '5-9': 'japanese-restaurant',  // 일식
+  '5-10': 'chinese-restaurant',  // 중식
+  '5-11': 'chicken-pizza',       // 치킨/피자
+  '5-12': 'korean-restaurant',   // 한식
+  '5-13': 'korean-bbq',          // BBQ
+  '5-1028': 'cafe',              // 카페/경양식
+  '5-1029': 'bakery',            // 제과점/떡집
 
-  // Medical (category_id: 7)
-  '7-1': 'internal-medicine',
-  '7-2': 'obgyn',
-  '7-3': 'pediatrics',
-  '7-4': 'dermatology',
-  '7-5': 'ophthalmology',
-  '7-6': 'ent',
-  '7-7': 'orthopedics',
-  '7-8': 'korean-medicine',
-  '7-9': 'pharmacy',
+  // Cat 6: 병원/약국 → medical
+  '6-14': 'internal-medicine',   // 내과/외과/정형외과
+  '6-15': 'podiatry',            // 발 전문의
+  '6-16': 'obgyn',               // 산부인과/비뇨기과
+  '6-17': 'pediatrics',          // 소아과
+  '6-18': 'ophthalmology',       // 안과/검안
+  '6-19': 'pharmacy',            // 약국
+  '6-20': 'ent',                 // 이비인후과/보청기
+  '6-21': 'general-hospital',    // 종합병원
+  '6-22': 'pain-management',     // 척추/통증/재활
+  '6-23': 'dermatology',         // 피부과
+  '6-24': 'korean-medicine',     // 한의원
+  '6-1027': 'psychiatry',        // 임상심리
 
-  // Dental (category_id: 8)
-  '8-1': 'general-dentist',
-  '8-2': 'orthodontist',
-  '8-3': 'pediatric-dentist',
-  '8-4': 'dental-implants',
+  // Cat 7: 쇼핑 → shopping
+  '7-25': 'furniture',           // 가구
+  '7-26': 'florist',             // 꽃집/웨딩
+  '7-28': 'jewelry',             // 보석/귀금속
+  '7-29': 'optical',             // 안경
+  '7-31': 'electronics',         // 전자/가전제품
+  '7-32': 'clothing',            // 패션
 
-  // Add more mappings as needed based on actual data
+  // Cat 8: 치과 → dental
+  '8-34': 'orthodontist',        // 교정치과
+  '8-35': 'prosthodontist',      // 보철치과
+  '8-36': 'pediatric-dentist',   // 어린이치과
+  '8-37': 'general-dentist',     // 종합치과
+  '8-38': 'dental-lab',          // 치과기공
+  '8-39': 'dental-implants',     // 치아이식
+
+  // Cat 9: 성형외과 → medical
+  '9-41': 'plastic-surgery',     // 성형외과
+  '9-42': 'dermatology',         // 스킨케어
+
+  // Cat 10: 미용/뷰티 → beauty
+  '10-45': 'hair-salon',         // 미용실/네일
+
+  // Cat 11: 여행 → travel
+  '11-49': 'travel-agency',      // 여행사
+  '11-51': 'airline',            // 항공사
+  '11-52': 'hotel',              // 호텔/민박
+
+  // Cat 12: 보험 → insurance
+  '12-53': 'health-insurance',   // 건강보험
+  '12-54': 'life-insurance',     // 생명/교육/연금보험
+  '12-55': 'auto-insurance',     // 자동차보험
+  '12-56': 'business-insurance', // 종합보험
+
+  // Cat 13: 건강 → medical
+  '13-60': 'obgyn',              // 산후조리
+
+  // Cat 14: 변호사 → legal
+  '14-64': 'notary',             // 대서/공증/번역
+  '14-65': 'business-lawyer',    // 법률컨설팅
+  '14-68': 'immigration-lawyer', // 비자/이민/유학
+
+  // Cat 15: 부동산 → real-estate
+  '15-69': 'residential-realtor', // 부동산
+
+  // Cat 16: 자동차 → auto
+  '16-70': 'car-rental',         // 렌터카
+  '16-71': 'car-dealer',         // 매매/리스
+  '16-72': 'car-wash',           // 세차장
+  '16-74': 'auto-repair',        // 정비/수리
+  '16-76': 'tires',              // 타이어/부품
+
+  // Cat 17: 은행/금융 → financial
+  '17-78': 'mortgage-broker',    // 융자/대출
+  '17-79': 'bank',               // 은행
+  '17-80': 'financial-advisor',  // 재정관리/투자
+
+  // Cat 18: 마켓 → food
+  '18-81': 'grocery',            // 리커스토어
+  '18-82': 'grocery',            // 마켓
+  '18-84': 'grocery',            // 식품도매
+
+  // Cat 19: 택시/대리 → auto
+  '19-87': 'taxi',               // 택시/리무진/버스
+
+  // Cat 20: 학교/학원 → education
+  '20-89': 'tutoring',           // 애프터스쿨
+  '20-90': 'driving-school',     // 운전학교
+  '20-91': 'preschool',          // 유치원/놀이방
+  '20-92': 'language-school',    // 유학/언어연수
+  '20-93': 'music-school',       // 음악/미술/무용
+  '20-94': 'language-school',    // 한글학교
+  '20-95': 'sat-prep',           // SAT
+
+  // Cat 22: 이사/택배 → home-services
+  '22-106': 'locksmith',         // 열쇠/금고
+  '22-107': 'moving',            // 이사/운송
+  '22-109': 'shipping',          // 택배
+
+  // Cat 23: 회계사 → financial
+  '23-110': 'tax-preparer',      // 세무사
+  '23-111': 'cpa',               // 공인회계사
+  '23-112': 'cpa',               // 회계사 사무소
+
+  // Cat 24: 노래/주점 → food
+  '24-113': 'nightlife',         // 나이트클럽
+  '24-114': 'nightlife',         // 노래방
+  '24-115': 'nightlife',         // Bar/주점/와인
+
+  // Cat 25: 건축/설계 → home-services
+  '25-117': 'construction',      // 건축/건설/시공
+  '25-118': 'construction',      // 건축자재/장비/설치
+  '25-121': 'handyman',          // 마루/목공/핸디맨
+  '25-122': 'construction',      // 설계/인테리어
+  '25-126': 'pest-control',      // 페스트컨트롤
+
+  // Cat 26: 컴퓨터 → shopping
+  '26-129': 'electronics',       // 컴퓨터
+  '26-132': 'electronics',       // 휴대폰
+
+  // Cat 27: 종교 → community
+  '27-134': 'church',            // 교회
+  '27-136': 'temple',            // 불교/절
+  '27-137': 'church',            // 성당
+
+  // Cat 28: 단체/기관 → community
+  '28-139': 'organization',      // 동문회
+  '28-140': 'media',             // 언론기관/방송사
+  '28-141': 'organization',      // 주정부기관/단체
 };
 
 // Get our category mapping from RadioKorea category code

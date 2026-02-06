@@ -44,6 +44,8 @@ export const PRIMARY_CATEGORIES: PrimaryCategory[] = [
       { slug: 'diagnostics', nameKo: '진단/검진', nameEn: 'Diagnostics' },
       { slug: 'korean-medicine', nameKo: '한의원', nameEn: 'Korean Medicine' },
       { slug: 'pharmacy', nameKo: '약국', nameEn: 'Pharmacy' },
+      { slug: 'general-hospital', nameKo: '종합병원', nameEn: 'General Hospital' },
+      { slug: 'optometrist', nameKo: '검안의', nameEn: 'Optometrist' },
     ],
   },
   {
@@ -123,6 +125,8 @@ export const PRIMARY_CATEGORIES: PrimaryCategory[] = [
       { slug: 'bakery', nameKo: '베이커리', nameEn: 'Bakery' },
       { slug: 'cafe', nameKo: '카페', nameEn: 'Cafe' },
       { slug: 'grocery', nameKo: '마켓', nameEn: 'Grocery' },
+      { slug: 'nightlife', nameKo: '나이트라이프', nameEn: 'Nightlife' },
+      { slug: 'chicken-pizza', nameKo: '치킨/피자', nameEn: 'Chicken & Pizza' },
     ],
   },
   {
@@ -150,6 +154,7 @@ export const PRIMARY_CATEGORIES: PrimaryCategory[] = [
       { slug: 'tires', nameKo: '타이어', nameEn: 'Tires' },
       { slug: 'towing', nameKo: '토잉', nameEn: 'Towing' },
       { slug: 'car-rental', nameKo: '렌터카', nameEn: 'Car Rental' },
+      { slug: 'taxi', nameKo: '택시', nameEn: 'Taxi' },
     ],
   },
   {
@@ -169,6 +174,9 @@ export const PRIMARY_CATEGORIES: PrimaryCategory[] = [
       { slug: 'carpet', nameKo: '카펫', nameEn: 'Carpet' },
       { slug: 'locksmith', nameKo: '열쇠', nameEn: 'Locksmith' },
       { slug: 'pest-control', nameKo: '해충방제', nameEn: 'Pest Control' },
+      { slug: 'laundry', nameKo: '세탁', nameEn: 'Laundry' },
+      { slug: 'shipping', nameKo: '택배', nameEn: 'Shipping' },
+      { slug: 'handyman', nameKo: '핸디맨', nameEn: 'Handyman' },
     ],
   },
   {
