@@ -242,6 +242,7 @@ export const PRIMARY_CATEGORIES: PrimaryCategory[] = [
       { slug: 'organization', nameKo: '단체', nameEn: 'Organization' },
       { slug: 'senior-center', nameKo: '양로원', nameEn: 'Senior Center' },
       { slug: 'media', nameKo: '언론', nameEn: 'Media' },
+      { slug: 'fitness', nameKo: '헬스/피트니스', nameEn: 'Fitness' },
     ],
   },
 ];

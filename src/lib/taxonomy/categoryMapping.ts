@@ -92,7 +92,7 @@ export const RADIOKOREA_MAPPING: Record<string, { primary: string; sub?: string 
   'J07': { primary: 'auto', sub: 'tires' }, // 자동차(타이어)
   'J08': { primary: 'auto', sub: 'towing' }, // 자동차(토잉서비스)
   'J09': { primary: 'auto' }, // 자동차(폐차장)
-  'T02': { primary: 'auto' }, // 택시/리무진/버스
+  'T02': { primary: 'auto', sub: 'taxi' }, // 택시/리무진/버스
 
   // Home Services - 홈서비스
   'A16': { primary: 'home-services', sub: 'locksmith' }, // 열쇠/금고/락스미스 ★ KEY FIX
@@ -109,15 +109,15 @@ export const RADIOKOREA_MAPPING: Record<string, { primary: string; sub?: string 
   'Q03': { primary: 'home-services', sub: 'cleaning' }, // 카펫크리닝
   'P01': { primary: 'home-services', sub: 'pest-control' }, // 페스트콘트롤/터마이트/소독
   'M04': { primary: 'home-services', sub: 'construction' }, // 목수/집수리/핸디맨/주방케비넷/욕조재생
-  'C01': { primary: 'home-services' }, // 차고문
-  'C04': { primary: 'home-services' }, // 철공소/용접
-  'S09': { primary: 'home-services' }, // 수영장(공사/관리/청소)
+  'C01': { primary: 'home-services', sub: 'construction' }, // 차고문
+  'C04': { primary: 'home-services', sub: 'construction' }, // 철공소/용접
+  'S09': { primary: 'home-services', sub: 'construction' }, // 수영장(공사/관리/청소)
 
   // Education - 교육
   'H01': { primary: 'education', sub: 'preschool' }, // 학교(어린이-정규/패밀리)
   'H02': { primary: 'education', sub: 'music-school' }, // 학교/학원(예능)
   'H03': { primary: 'education', sub: 'tutoring' }, // 학교/학원(일반)
-  'H04': { primary: 'education' }, // 학교/학원(직업/취업)
+  'H04': { primary: 'education', sub: 'tutoring' }, // 학교/학원(직업/취업)
   'A21': { primary: 'education', sub: 'driving-school' }, // 운전학교/교통위반자학교
   'C08': { primary: 'education', sub: 'martial-arts' }, // 체육관/태권도/단센터/검도
   'D03': { primary: 'education', sub: 'dance-school' }, // 댄스/사교장
@@ -185,7 +185,7 @@ export const RADIOKOREA_MAPPING: Record<string, { primary: string; sub?: string 
   'A17': { primary: 'community' }, // 오토바이/자전거(판매/수리)
   'A19': { primary: 'professional' }, // 우체국/사서함
   'A20': { primary: 'shopping' }, // 운동구점/골프용품/낚시/캠핑
-  'A23': { primary: 'home-services' }, // 유리점/거울/틴트/창문시공
+  'A23': { primary: 'home-services', sub: 'construction' }, // 유리점/거울/틴트/창문시공
   'A27': { primary: 'shopping' }, // 음향시스템/오디오장비/CD/녹음/레코드
   'A30': { primary: 'shopping' }, // 이불/자수
   'B02': { primary: 'financial' }, // 보석금(베일본드)
@@ -293,6 +293,7 @@ export const KOREADAILY_SUB_MAPPING: Record<string, string> = {
   '7-29': 'optical',             // 안경
   '7-31': 'electronics',         // 전자/가전제품
   '7-32': 'clothing',            // 패션
+  '7-33': 'cosmetics',           // 화장품 [CROSS→beauty]
 
   // Cat 8: 치과 → dental
   '8-34': 'orthodontist',        // 교정치과
@@ -323,9 +324,14 @@ export const KOREADAILY_SUB_MAPPING: Record<string, string> = {
   // Cat 13: 건강 → medical
   '13-60': 'obgyn',              // 산후조리
 
+  // Cat 13: 건강 → medical (additions)
+  '13-62': 'spa',               // 지압/마사지 [CROSS→beauty]
+  '13-63': 'spa',               // 찜질방/사우나 [CROSS→beauty]
+
   // Cat 14: 변호사 → legal
   '14-64': 'notary',             // 대서/공증/번역
   '14-65': 'business-lawyer',    // 법률컨설팅
+  '14-67': 'business-lawyer',    // 변호사 (일반)
   '14-68': 'immigration-lawyer', // 비자/이민/유학
 
   // Cat 15: 부동산 → real-estate
@@ -360,6 +366,11 @@ export const KOREADAILY_SUB_MAPPING: Record<string, string> = {
   '20-94': 'language-school',    // 한글학교
   '20-95': 'sat-prep',           // SAT
 
+  // Cat 21: 운동/오락 → community (additions)
+  '21-96': 'organization',       // 골프 (골프클럽/동호회)
+  '21-100': 'martial-arts',      // 태권도 [CROSS→education]
+  '21-101': 'fitness',           // 헬스/피트니스
+
   // Cat 22: 이사/택배 → home-services
   '22-106': 'locksmith',         // 열쇠/금고
   '22-107': 'moving',            // 이사/운송
@@ -384,10 +395,13 @@ export const KOREADAILY_SUB_MAPPING: Record<string, string> = {
 
   // Cat 26: 컴퓨터 → shopping
   '26-129': 'electronics',       // 컴퓨터
+  '26-130': 'tutoring',          // 컴퓨터학원 [CROSS→education]
+  '26-131': 'advertising',       // 홈페이지제작 [CROSS→professional]
   '26-132': 'electronics',       // 휴대폰
 
   // Cat 27: 종교 → community
   '27-134': 'church',            // 교회
+  '27-135': 'church',            // 기타종교
   '27-136': 'temple',            // 불교/절
   '27-137': 'church',            // 성당
 
@@ -395,6 +409,19 @@ export const KOREADAILY_SUB_MAPPING: Record<string, string> = {
   '28-139': 'organization',      // 동문회
   '28-140': 'media',             // 언론기관/방송사
   '28-141': 'organization',      // 주정부기관/단체
+};
+
+// Cross-category fixes for KoreaDaily entries that need both primary AND sub changed
+// Key format: '{category_id}-{sub_idx}' → { primary, sub }
+// These entries are also in KOREADAILY_SUB_MAPPING (for the sub slug) but need primary override
+export const KOREADAILY_CROSS_CATEGORY_FIXES: Record<string, { primary: string; sub: string }> = {
+  '21-100': { primary: 'education', sub: 'martial-arts' },    // 태권도: community → education
+  '21-101': { primary: 'community', sub: 'fitness' },         // 헬스/피트니스: stays community, just add sub
+  '7-33':   { primary: 'beauty', sub: 'cosmetics' },          // 화장품: shopping → beauty
+  '13-62':  { primary: 'beauty', sub: 'spa' },                // 지압/마사지: medical → beauty
+  '13-63':  { primary: 'beauty', sub: 'spa' },                // 찜질방/사우나: medical → beauty
+  '26-130': { primary: 'education', sub: 'tutoring' },        // 컴퓨터학원: shopping → education
+  '26-131': { primary: 'professional', sub: 'advertising' },  // 홈페이지제작: shopping → professional
 };
 
 // Get our category mapping from RadioKorea category code
