@@ -17,6 +17,31 @@ import { formatBilingual, UI_LABELS } from '@/lib/i18n/labels';
 import { getCountryByCode, getIntlRegionNameEn } from '@/lib/i18n/countries';
 import { computeOpenNow } from '@/lib/enrichment/helpers';
 
+export const revalidate = 604800; // 7 days
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const businesses = await prisma.business.findMany({
+    where: {
+      slug: { not: null },
+      googlePlace: {
+        rating: { gte: 4.2 },
+        userRatingsTotal: { gte: 10 },
+        fetchStatus: 'ok',
+      },
+    },
+    select: { slug: true },
+    take: 5000,
+  });
+
+  const params = businesses
+    .filter((b): b is { slug: string } => !!b.slug)
+    .map(b => ({ slug: b.slug }));
+
+  console.log(`[generateStaticParams] Business pages: ${params.length} paths`);
+  return params;
+}
+
 interface PageProps {
   params: Promise<{
     slug: string;

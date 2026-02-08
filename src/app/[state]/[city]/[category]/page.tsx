@@ -11,6 +11,8 @@ import { JsonLd } from '@/components/JsonLd';
 import {
   isPrimaryCategory,
   isSubcategory,
+  getPrimaryCategory,
+  getSubcategory,
 } from '@/lib/taxonomy/categories';
 import {
   generateL1Metadata,
@@ -22,6 +24,10 @@ import {
 } from '@/lib/seo/meta';
 import { getCityNameKo, getStateNameKo, UI_LABELS } from '@/lib/i18n/labels';
 import { computeOpenNow } from '@/lib/enrichment/helpers';
+import { isMalformedCity } from '@/lib/seo/slug-utils';
+
+export const revalidate = 86400; // 24 hours
+export const dynamicParams = true;
 
 const ITEMS_PER_PAGE = 20;
 const BASE_URL = 'https://www.haninmap.com';
@@ -35,6 +41,75 @@ interface PageProps {
   searchParams: Promise<{
     page?: string;
   }>;
+}
+
+export async function generateStaticParams() {
+  const MIN_COUNT = 50;
+
+  const categories = await prisma.category.findMany({
+    select: { id: true, slug: true, level: true },
+  });
+  const categoryMap = new Map(categories.map(c => [c.id, c]));
+
+  const params: Array<{ state: string; city: string; category: string }> = [];
+  const added = new Set<string>();
+
+  // Primary categories with 50+ businesses
+  const primaryCounts = await prisma.business.groupBy({
+    by: ['city', 'state', 'primaryCategoryId'],
+    _count: { _all: true },
+    where: { countryCode: 'US' },
+    having: { city: { _count: { gte: MIN_COUNT } } },
+  });
+
+  for (const item of primaryCounts) {
+    if (!item.city || !item.state || !item.primaryCategoryId) continue;
+    if (item._count._all < MIN_COUNT) continue;
+    if (isMalformedCity(item.city)) continue;
+
+    const cat = categoryMap.get(item.primaryCategoryId);
+    if (!cat || cat.level !== 'primary') continue;
+
+    const key = `${item.state}|${item.city}|${cat.slug}`;
+    if (added.has(key)) continue;
+    added.add(key);
+
+    params.push({
+      state: item.state.toLowerCase(),
+      city: item.city.toLowerCase().replace(/\s+/g, '-'),
+      category: cat.slug,
+    });
+  }
+
+  // Subcategories with 50+ businesses
+  const subCounts = await prisma.business.groupBy({
+    by: ['city', 'state', 'subcategoryId'],
+    _count: { _all: true },
+    where: { countryCode: 'US', subcategoryId: { not: null } },
+    having: { city: { _count: { gte: MIN_COUNT } } },
+  });
+
+  for (const item of subCounts) {
+    if (!item.city || !item.state || !item.subcategoryId) continue;
+    if (item._count._all < MIN_COUNT) continue;
+    if (isMalformedCity(item.city)) continue;
+
+    const cat = categoryMap.get(item.subcategoryId);
+    if (!cat || cat.level !== 'sub') continue;
+
+    const key = `${item.state}|${item.city}|${cat.slug}`;
+    if (added.has(key)) continue;
+    added.add(key);
+
+    params.push({
+      state: item.state.toLowerCase(),
+      city: item.city.toLowerCase().replace(/\s+/g, '-'),
+      category: cat.slug,
+    });
+  }
+
+  console.log(`[generateStaticParams] Category pages: ${params.length} paths`);
+  return params;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -59,6 +134,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   });
 
   if (categoryInfo.level === 'primary') {
+    const taxonomyData = getPrimaryCategory(category);
     return generateL1Metadata({
       city,
       state,
@@ -66,8 +142,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       categoryNameKo: categoryInfo.nameKo,
       count,
       categorySlug: categoryInfo.slug,
+      categoryDescriptionKo: taxonomyData?.descriptionKo,
+      categoryDescriptionEn: taxonomyData?.descriptionEn,
     });
   } else {
+    const taxonomyData = getSubcategory(category);
     return generateL2Metadata({
       city,
       state,
@@ -76,6 +155,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       primaryCategoryNameEn: categoryInfo.parentNameEn || categoryInfo.nameEn,
       count,
       subcategorySlug: categoryInfo.slug,
+      subcategoryDescriptionKo: taxonomyData?.subcategory.descriptionKo,
+      subcategoryDescriptionEn: taxonomyData?.subcategory.descriptionEn,
     });
   }
 }
@@ -185,6 +266,11 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   const h1Title = `${locationKo} 한인 ${categoryInfo.nameKo} (${categoryInfo.nameEn} in ${locationEn})`;
   const koreanSubtitle = `한국어 상담 가능 | Korean-speaking ${categoryInfo.nameEn.toLowerCase()}`;
 
+  // Get unique description from taxonomy
+  const taxonomyDesc = categoryInfo.level === 'primary'
+    ? getPrimaryCategory(category)?.descriptionKo
+    : getSubcategory(category)?.subcategory.descriptionKo;
+
   // FAQs
   const faqs = totalCount > 0 ? generateCategoryFAQs({
     categoryNameEn: categoryInfo.nameEn,
@@ -240,6 +326,9 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
 
         <header className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">{h1Title}</h1>
+          {taxonomyDesc && (
+            <p className="text-gray-700 mt-2 text-sm leading-relaxed">{taxonomyDesc}</p>
+          )}
           <h2 className="text-lg text-gray-700 mt-1">{koreanSubtitle}</h2>
           <p className="text-gray-600 mt-2">
             {totalCount} {UI_LABELS.businessesFound.ko} ({totalCount} {UI_LABELS.businessesFound.en})

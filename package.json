@@ -28,10 +28,14 @@
     "promote:ca": "npx tsx scripts/promote-ca.ts",
     "promote:au": "npx tsx scripts/promote-au.ts",
     "promote:all": "npm run promote:ca && npm run promote:au",
-    "seo:audit": "npx tsx scripts/seo/audit-indexing.ts --base=${BASE_URL:-https://www.haninmap.com} --pathsFromSitemap=true --sample=300"
+    "seo:audit": "npx tsx scripts/seo/audit-indexing.ts --base=${BASE_URL:-https://www.haninmap.com} --pathsFromSitemap=true --sample=300",
+    "urls:generate": "npx tsx scripts/generate-url-list.ts",
+    "urls:submit": "npx tsx scripts/submit-to-gsc.ts",
+    "urls:status": "npx tsx scripts/check-index-status.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
+    "googleapis": "^171.4.0",
     "next": "14.2.35",
     "prisma": "^5.22.0",
     "react": "^18",

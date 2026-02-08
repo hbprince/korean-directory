@@ -38,3 +38,10 @@ next-env.d.ts
 
 /src/generated/prisma
 .env.vercel
+
+# generated URL lists
+urls-*.txt
+status-*.csv
+.gsc-offset
+.gsc-batch-tmp.txt
+logs/

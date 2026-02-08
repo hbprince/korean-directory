@@ -44,8 +44,10 @@ export function generateL1Metadata(params: {
   categoryNameKo: string;
   count: number;
   categorySlug?: string;
+  categoryDescriptionKo?: string;
+  categoryDescriptionEn?: string;
 }): Metadata {
-  const { city, state, categoryNameEn, categoryNameKo, count, categorySlug } = params;
+  const { city, state, categoryNameEn, categoryNameKo, count, categorySlug, categoryDescriptionKo, categoryDescriptionEn } = params;
   const cityDisplay = toTitleCase(city.replace(/-/g, ' '));
   const cityKo = getCityNameKo(city);
   const stateDisplay = state.toUpperCase();
@@ -54,9 +56,17 @@ export function generateL1Metadata(params: {
   // Pattern: "{cityKo} {categoryKo} 한인업소 | HaninMap"
   const title = `${cityKo} ${categoryNameKo} 한인업소 | ${cityDisplay} Korean ${categoryNameEn}`;
 
-  const description = count > 0
-    ? `${cityKo} 한인 ${categoryNameKo} ${count}곳. Korean ${categoryNameEn.toLowerCase()} in ${cityDisplay}, ${stateDisplay}. 전화번호, 주소, 평점, 리뷰.`
-    : `${cityKo} 한인 ${categoryNameKo}. Find Korean ${categoryNameEn.toLowerCase()} in ${cityDisplay}, ${stateDisplay}.`;
+  // Use unique category description if available, fall back to template
+  let description: string;
+  if (categoryDescriptionKo && count > 0) {
+    description = `${cityKo} ${categoryDescriptionKo.slice(0, 120)} ${count}곳 등록.`;
+  } else if (categoryDescriptionEn && count > 0) {
+    description = `${cityKo} 한인 ${categoryNameKo} ${count}곳. ${categoryDescriptionEn.slice(0, 120)}`;
+  } else {
+    description = count > 0
+      ? `${cityKo} 한인 ${categoryNameKo} ${count}곳. Korean ${categoryNameEn.toLowerCase()} in ${cityDisplay}, ${stateDisplay}. 전화번호, 주소, 평점, 리뷰.`
+      : `${cityKo} 한인 ${categoryNameKo}. Find Korean ${categoryNameEn.toLowerCase()} in ${cityDisplay}, ${stateDisplay}.`;
+  }
 
   const slug = categorySlug || categoryNameEn.toLowerCase().replace(/\s+/g, '-');
   const url = canonicalUrl(state, city, slug);
@@ -89,17 +99,27 @@ export function generateL2Metadata(params: {
   primaryCategoryNameEn: string;
   count: number;
   subcategorySlug?: string;
+  subcategoryDescriptionKo?: string;
+  subcategoryDescriptionEn?: string;
 }): Metadata {
-  const { city, state, subcategoryNameEn, subcategoryNameKo, count, subcategorySlug } = params;
+  const { city, state, subcategoryNameEn, subcategoryNameKo, count, subcategorySlug, subcategoryDescriptionKo, subcategoryDescriptionEn } = params;
   const cityDisplay = toTitleCase(city.replace(/-/g, ' '));
   const cityKo = getCityNameKo(city);
   const stateDisplay = state.toUpperCase();
 
   const title = `${cityKo} ${subcategoryNameKo} 한인업소 | ${cityDisplay} Korean ${subcategoryNameEn}`;
 
-  const description = count > 0
-    ? `${cityKo} 한인 ${subcategoryNameKo} ${count}곳. Korean ${subcategoryNameEn.toLowerCase()} in ${cityDisplay}, ${stateDisplay}. 전화번호, 주소, 평점.`
-    : `${cityKo} 한인 ${subcategoryNameKo}. Find Korean ${subcategoryNameEn.toLowerCase()} in ${cityDisplay}, ${stateDisplay}.`;
+  // Use unique subcategory description if available, fall back to template
+  let description: string;
+  if (subcategoryDescriptionKo && count > 0) {
+    description = `${cityKo} ${subcategoryDescriptionKo.slice(0, 120)} ${count}곳 등록.`;
+  } else if (subcategoryDescriptionEn && count > 0) {
+    description = `${cityKo} 한인 ${subcategoryNameKo} ${count}곳. ${subcategoryDescriptionEn.slice(0, 120)}`;
+  } else {
+    description = count > 0
+      ? `${cityKo} 한인 ${subcategoryNameKo} ${count}곳. Korean ${subcategoryNameEn.toLowerCase()} in ${cityDisplay}, ${stateDisplay}. 전화번호, 주소, 평점.`
+      : `${cityKo} 한인 ${subcategoryNameKo}. Find Korean ${subcategoryNameEn.toLowerCase()} in ${cityDisplay}, ${stateDisplay}.`;
+  }
 
   const slug = subcategorySlug || subcategoryNameEn.toLowerCase().replace(/\s+/g, '-');
   const url = canonicalUrl(state, city, slug);
