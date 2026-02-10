@@ -31,42 +31,46 @@ export function CategoryNav({
 
   return (
     <nav className="border-b border-gray-200 pb-4 mb-6">
-      {/* Primary Categories - Korean (English) format */}
-      <div className="flex flex-wrap gap-2">
+      {/* Primary Categories - horizontal scrolling row */}
+      <div className="flex flex-nowrap overflow-x-auto gap-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {PRIMARY_CATEGORIES.map((category) => {
           const isActive = category.slug === activePrimarySlug;
           return (
             <Link
               key={category.slug}
               href={`${pathPrefix}/${category.slug}`}
-              className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
+              className={`shrink-0 px-3 py-1.5 text-sm rounded-full transition-colors ${
                 isActive
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              {category.nameKo} ({category.nameEn})
+              {isActive
+                ? `${category.nameKo} (${category.nameEn})`
+                : category.nameKo}
             </Link>
           );
         })}
       </div>
 
-      {/* Subcategories - Korean (English) format */}
+      {/* Subcategories - horizontal scrolling row */}
       {activePrimary && activePrimary.subcategories.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-100">
+        <div className="flex flex-nowrap overflow-x-auto gap-2 mt-3 pt-3 border-t border-gray-100 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {activePrimary.subcategories.map((sub) => {
             const isActiveSub = currentSubcategory === sub.slug;
             return (
               <Link
                 key={sub.slug}
                 href={`${pathPrefix}/${sub.slug}`}
-                className={`px-2 py-1 text-xs rounded transition-colors ${
+                className={`shrink-0 px-2 py-1 text-xs rounded transition-colors ${
                   isActiveSub
                     ? 'bg-blue-100 text-blue-700 font-medium'
                     : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
                 }`}
               >
-                {sub.nameKo} ({sub.nameEn})
+                {isActiveSub
+                  ? `${sub.nameKo} (${sub.nameEn})`
+                  : sub.nameKo}
               </Link>
             );
           })}

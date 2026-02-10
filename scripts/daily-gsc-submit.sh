@@ -7,6 +7,8 @@
 
 set -e
 
+export PATH="/opt/homebrew/bin:$PATH"
+
 PROJECT_DIR="/Users/hbrandon/k business directory/korean-directory"
 OFFSET_FILE="$PROJECT_DIR/.gsc-offset"
 LOG_DIR="$PROJECT_DIR/logs"
