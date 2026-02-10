@@ -353,6 +353,23 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
           )}
         </header>
 
+        {/* Filters: City → Category → Subcategory */}
+        <CityFilter
+          cities={cityFilterData}
+          totalCount={cityTotalCount}
+          state={state}
+          currentCity={city}
+          category={category}
+        />
+
+        <CategoryNav
+          currentState={state}
+          currentCity={city}
+          currentCategory={categoryInfo.level === 'primary' ? category : undefined}
+          currentSubcategory={categoryInfo.level === 'sub' ? category : undefined}
+          parentCategorySlug={categoryInfo.parentSlug}
+        />
+
         {/* Business Cards + Pagination */}
         {businesses.length === 0 ? (
           <div className="text-center py-12 bg-gray-50 rounded-lg">
@@ -392,24 +409,6 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
             />
           </>
         )}
-
-        {/* Category Navigation */}
-        <CategoryNav
-          currentState={state}
-          currentCity={city}
-          currentCategory={categoryInfo.level === 'primary' ? category : undefined}
-          currentSubcategory={categoryInfo.level === 'sub' ? category : undefined}
-          parentCategorySlug={categoryInfo.parentSlug}
-        />
-
-        {/* City Filter */}
-        <CityFilter
-          cities={cityFilterData}
-          totalCount={cityTotalCount}
-          state={state}
-          currentCity={city}
-          category={category}
-        />
 
         {/* Category Intro (unique content block) - only on page 1 */}
         {totalCount > 0 && page === 1 && (

@@ -31,15 +31,15 @@ export function CategoryNav({
 
   return (
     <nav className="border-b border-gray-200 pb-4 mb-6">
-      {/* Primary Categories - horizontal scrolling row */}
-      <div className="flex flex-nowrap overflow-x-auto gap-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      {/* Primary Categories - mobile: horizontal scroll / desktop: wrap */}
+      <div className="flex flex-nowrap overflow-x-auto md:flex-wrap md:overflow-visible gap-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {PRIMARY_CATEGORIES.map((category) => {
           const isActive = category.slug === activePrimarySlug;
           return (
             <Link
               key={category.slug}
               href={`${pathPrefix}/${category.slug}`}
-              className={`shrink-0 px-3 py-1.5 text-sm rounded-full transition-colors ${
+              className={`shrink-0 md:shrink px-3 py-1.5 text-sm rounded-full transition-colors ${
                 isActive
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -53,16 +53,16 @@ export function CategoryNav({
         })}
       </div>
 
-      {/* Subcategories - horizontal scrolling row */}
+      {/* Subcategories - mobile: horizontal scroll / desktop: wrap */}
       {activePrimary && activePrimary.subcategories.length > 0 && (
-        <div className="flex flex-nowrap overflow-x-auto gap-2 mt-3 pt-3 border-t border-gray-100 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="flex flex-nowrap overflow-x-auto md:flex-wrap md:overflow-visible gap-2 mt-3 pt-3 border-t border-gray-100 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {activePrimary.subcategories.map((sub) => {
             const isActiveSub = currentSubcategory === sub.slug;
             return (
               <Link
                 key={sub.slug}
                 href={`${pathPrefix}/${sub.slug}`}
-                className={`shrink-0 px-2 py-1 text-xs rounded transition-colors ${
+                className={`shrink-0 md:shrink px-2 py-1 text-xs rounded transition-colors ${
                   isActiveSub
                     ? 'bg-blue-100 text-blue-700 font-medium'
                     : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
