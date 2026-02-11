@@ -13,6 +13,7 @@ import {
   buildFAQPageSchema,
   buildBusinessBreadcrumbs,
 } from '@/lib/seo/meta';
+import { PhotoGallery } from '@/components/PhotoGallery';
 import { formatBilingual, UI_LABELS } from '@/lib/i18n/labels';
 import { getCountryByCode, getIntlRegionNameEn } from '@/lib/i18n/countries';
 import { computeOpenNow } from '@/lib/enrichment/helpers';
@@ -221,27 +222,10 @@ export default async function BusinessPage({ params }: PageProps) {
           </div>
         </header>
 
-        {/* Photo Gallery */}
-        {(() => {
-          if (!photos || photos.length === 0) return null;
-          return (
-            <section className="mb-8">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                {photos.slice(0, 4).map((photo, idx) => (
-                  <div key={idx} className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={photo.url}
-                      alt={`${displayName} - 사진 ${idx + 1}`}
-                      className="w-full h-full object-cover"
-                      loading={idx === 0 ? 'eager' : 'lazy'}
-                    />
-                  </div>
-                ))}
-              </div>
-            </section>
-          );
-        })()}
+        {/* Photo Gallery - client component handles broken image URLs gracefully */}
+        {photos && photos.length > 0 && (
+          <PhotoGallery photos={photos} businessName={displayName} />
+        )}
 
         {/* Contact Information */}
         <section className="grid md:grid-cols-2 gap-8 mb-8">
