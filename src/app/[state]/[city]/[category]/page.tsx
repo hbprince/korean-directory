@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import prisma from '@/lib/db/prisma';
 import { BusinessCard } from '@/components/BusinessCard';
 import { CategoryNav } from '@/components/CategoryNav';
@@ -421,9 +422,57 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
           />
         )}
 
+        {/* Related Guides */}
+        {page === 1 && (
+          <RelatedGuides
+            categorySlug={categoryInfo.parentSlug || categoryInfo.slug}
+            categoryNameKo={categoryInfo.nameKo}
+          />
+        )}
+
         {faqs.length > 0 && <FAQSection faqs={faqs} />}
       </main>
     </>
+  );
+}
+
+async function RelatedGuides({
+  categorySlug,
+  categoryNameKo,
+}: {
+  categorySlug: string;
+  categoryNameKo: string;
+}) {
+  const guides = await prisma.guideContent.findMany({
+    where: {
+      categorySlug,
+      status: 'published',
+    },
+    orderBy: { viewCount: 'desc' },
+    take: 2,
+    select: { slug: true, titleKo: true, summary: true },
+  });
+
+  if (guides.length === 0) return null;
+
+  return (
+    <section className="mt-8 mb-8">
+      <h2 className="text-lg font-semibold mb-4">
+        관련 가이드 ({categoryNameKo})
+      </h2>
+      <div className="grid gap-4 md:grid-cols-2">
+        {guides.map((guide) => (
+          <Link
+            key={guide.slug}
+            href={`/guides/${guide.slug}`}
+            className="block p-4 bg-blue-50 border border-blue-100 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all"
+          >
+            <p className="font-medium text-gray-900 mb-1">{guide.titleKo}</p>
+            <p className="text-sm text-gray-600 line-clamp-2">{guide.summary}</p>
+          </Link>
+        ))}
+      </div>
+    </section>
   );
 }
 

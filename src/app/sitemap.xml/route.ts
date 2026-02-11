@@ -16,6 +16,7 @@ export async function GET() {
     'sitemap-us-categories.xml',
     'sitemap-intl-categories.xml',
     'sitemap-businesses.xml',
+    'sitemap-guides.xml',
   ];
 
   const today = new Date().toISOString().split('T')[0];

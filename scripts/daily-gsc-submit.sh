@@ -1,18 +1,17 @@
 #!/bin/bash
 #
 # daily-gsc-submit.sh
-# 매일 cron으로 실행: 다음 190개 URL을 GSC에 제출
+# launchd로 매일 실행: GSC Indexing API에 URL 제출
 # 진행 상황을 .gsc-offset 파일로 추적
+# 다른 서비스와 quota 공유 — 실제 성공 수만큼만 오프셋 전진
 #
 
-set -e
-
-export PATH="/opt/homebrew/bin:$PATH"
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 PROJECT_DIR="/Users/hbrandon/k business directory/korean-directory"
 OFFSET_FILE="$PROJECT_DIR/.gsc-offset"
 LOG_DIR="$PROJECT_DIR/logs"
-BATCH_SIZE=190
+BATCH_SIZE=200
 
 # 로그 디렉토리 생성
 mkdir -p "$LOG_DIR"
@@ -72,17 +71,30 @@ SUBMIT_COUNT=$((REMAINING < BATCH_SIZE ? REMAINING : BATCH_SIZE))
 BATCH_FILE="$PROJECT_DIR/.gsc-batch-tmp.txt"
 tail -n +"$((LINE_OFFSET + 1))" "$CURRENT_FILE" | head -n "$SUBMIT_COUNT" > "$BATCH_FILE"
 
-echo "Submitting $SUBMIT_COUNT URLs from ${FILES[$FILE_IDX]} (offset $LINE_OFFSET)" >> "$LOG_FILE"
+echo "Submitting up to $SUBMIT_COUNT URLs from ${FILES[$FILE_IDX]} (offset $LINE_OFFSET)" >> "$LOG_FILE"
 
-# 제출 실행
+# 제출 실행 — 출력을 캡처하여 실제 성공 수 파싱
 cd "$PROJECT_DIR"
-node --env-file=.env node_modules/.bin/tsx scripts/submit-to-gsc.ts "$BATCH_FILE" --limit="$BATCH_SIZE" >> "$LOG_FILE" 2>&1
+OUTPUT=$(node --env-file=.env node_modules/.bin/tsx scripts/submit-to-gsc.ts "$BATCH_FILE" --limit="$BATCH_SIZE" 2>&1) || true
 
-# 오프셋 업데이트
-NEW_OFFSET=$((LINE_OFFSET + SUBMIT_COUNT))
-echo "$FILE_IDX:$NEW_OFFSET" > "$OFFSET_FILE"
+echo "$OUTPUT" >> "$LOG_FILE"
 
-echo "Updated offset: $FILE_IDX:$NEW_OFFSET" >> "$LOG_FILE"
+# 실제 성공 수 파싱 (출력에서 "Success: N" 추출)
+ACTUAL_SUCCESS=$(echo "$OUTPUT" | grep -oE 'Success: [0-9]+' | grep -oE '[0-9]+')
+
+if [ -z "$ACTUAL_SUCCESS" ]; then
+  ACTUAL_SUCCESS=0
+fi
+
+# 성공한 만큼만 오프셋 전진
+if [ "$ACTUAL_SUCCESS" -gt 0 ]; then
+  NEW_OFFSET=$((LINE_OFFSET + ACTUAL_SUCCESS))
+  echo "$FILE_IDX:$NEW_OFFSET" > "$OFFSET_FILE"
+  echo "Updated offset: $FILE_IDX:$NEW_OFFSET (submitted $ACTUAL_SUCCESS)" >> "$LOG_FILE"
+else
+  echo "No URLs submitted (quota may be exhausted). Offset unchanged: $FILE_IDX:$LINE_OFFSET" >> "$LOG_FILE"
+fi
+
 echo "=== Done ===" >> "$LOG_FILE"
 
 # 임시 파일 삭제

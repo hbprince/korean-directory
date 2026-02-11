@@ -103,6 +103,9 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Guide Section */}
+      <GuideSection />
+
       {/* About Section */}
       <section className="bg-gray-50 rounded-lg p-6 mt-12">
         <h2 className="text-lg font-semibold mb-4">한인맵 소개 (About HaninMap)</h2>
@@ -165,6 +168,43 @@ function CityCard({
         {state.toUpperCase()} - {count.toLocaleString()} businesses
       </p>
     </Link>
+  );
+}
+
+async function GuideSection() {
+  const guides = await prisma.guideContent.findMany({
+    where: { status: 'published' },
+    orderBy: { createdAt: 'desc' },
+    take: 3,
+    select: { slug: true, titleKo: true, summary: true, categorySlug: true },
+  });
+
+  if (guides.length === 0) return null;
+
+  return (
+    <section className="mb-12">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold">미국 생활 가이드 (Life in the US)</h2>
+        <Link href="/guides" className="text-sm text-blue-600 hover:underline">
+          전체 보기 &rarr;
+        </Link>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {guides.map((guide) => (
+          <Link
+            key={guide.slug}
+            href={`/guides/${guide.slug}`}
+            className="block p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all"
+          >
+            <span className="inline-block px-2 py-0.5 text-xs bg-blue-50 text-blue-700 rounded mb-2">
+              {guide.categorySlug}
+            </span>
+            <p className="font-medium text-gray-900 mb-1">{guide.titleKo}</p>
+            <p className="text-sm text-gray-500 line-clamp-2">{guide.summary}</p>
+          </Link>
+        ))}
+      </div>
+    </section>
   );
 }
 

@@ -235,3 +235,26 @@ model StagedBusiness {
   @@index([promotionStatus])
   @@index([phoneE164])
 }
+
+model GuideContent {
+  id            Int       @id @default(autoincrement())
+  slug          String    @unique
+  titleKo       String
+  titleEn       String
+  contentKo     String    @db.Text
+  summary       String
+  categorySlug  String
+  faqsJson      Json      @default("[]")
+  sourceUrls    Json      @default("[]")
+  tags          Json      @default("[]")
+  seasonStart   Int?
+  seasonEnd     Int?
+  publishedAt   DateTime?
+  status        String    @default("draft")
+  viewCount     Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([categorySlug])
+  @@index([status])
+}
