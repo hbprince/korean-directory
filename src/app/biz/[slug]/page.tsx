@@ -111,9 +111,20 @@ export default async function BusinessPage({ params }: PageProps) {
   const cityDisplay = toTitleCase(business.city);
   const googlePlace = business.googlePlace;
 
-  // First photo URL for schema image
-  const photos = googlePlace?.photosJson as Array<{ url: string; width: number; height: number }> | null;
-  const firstPhotoUrl = photos?.[0]?.url ?? null;
+  // Extract photo references from stored URLs (strip API keys for security)
+  const rawPhotos = googlePlace?.photosJson as Array<{ url: string; width: number; height: number }> | null;
+  const photoRefs = (rawPhotos || [])
+    .map((p) => {
+      try {
+        const u = new URL(p.url);
+        return u.searchParams.get('photoreference');
+      } catch { return null; }
+    })
+    .filter((ref): ref is string => !!ref);
+  // First photo proxy URL for schema image
+  const firstPhotoUrl = photoRefs.length > 0
+    ? `https://www.haninmap.com/api/photo?ref=${encodeURIComponent(photoRefs[0])}&maxwidth=800`
+    : null;
 
   // Country-aware data
   const countryConfig = getCountryByCode(business.countryCode ?? 'US');
@@ -222,9 +233,9 @@ export default async function BusinessPage({ params }: PageProps) {
           </div>
         </header>
 
-        {/* Photo Gallery - client component handles broken image URLs gracefully */}
-        {photos && photos.length > 0 && (
-          <PhotoGallery photos={photos} businessName={displayName} />
+        {/* Photo Gallery - proxied through /api/photo to hide API key */}
+        {photoRefs.length > 0 && (
+          <PhotoGallery photoRefs={photoRefs} businessName={displayName} />
         )}
 
         {/* Contact Information */}

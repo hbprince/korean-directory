@@ -2,37 +2,32 @@
 
 import { useState } from 'react';
 
-interface Photo {
-  url: string;
-  width: number;
-  height: number;
-}
-
 interface PhotoGalleryProps {
-  photos: Photo[];
+  /** Photo references extracted server-side (no API keys) */
+  photoRefs: string[];
   businessName: string;
 }
 
-export function PhotoGallery({ photos, businessName }: PhotoGalleryProps) {
-  const [failedUrls, setFailedUrls] = useState<Set<string>>(new Set());
+export function PhotoGallery({ photoRefs, businessName }: PhotoGalleryProps) {
+  const [failedRefs, setFailedRefs] = useState<Set<string>>(new Set());
 
-  const visiblePhotos = photos.filter((p) => !failedUrls.has(p.url));
+  const visibleRefs = photoRefs.filter((ref) => !failedRefs.has(ref));
 
-  if (visiblePhotos.length === 0) return null;
+  if (visibleRefs.length === 0) return null;
 
   return (
     <section className="mb-8">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-        {visiblePhotos.slice(0, 4).map((photo, idx) => (
-          <div key={idx} className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+        {visibleRefs.slice(0, 4).map((ref, idx) => (
+          <div key={ref} className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={photo.url}
+              src={`/api/photo?ref=${encodeURIComponent(ref)}&maxwidth=800`}
               alt={`${businessName} - 사진 ${idx + 1}`}
               className="w-full h-full object-cover"
               loading={idx === 0 ? 'eager' : 'lazy'}
               onError={() => {
-                setFailedUrls((prev) => new Set(prev).add(photo.url));
+                setFailedRefs((prev) => new Set(prev).add(ref));
               }}
             />
           </div>
