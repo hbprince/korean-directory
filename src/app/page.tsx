@@ -60,7 +60,7 @@ export default async function HomePage() {
 
       {/* Quick Search by Category */}
       <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-6">카테고리별 찾기 (Browse by Category)</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-6">카테고리별 찾기 (Browse by Category)</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {PRIMARY_CATEGORIES.map((category) => (
             <CategoryCard
@@ -75,7 +75,7 @@ export default async function HomePage() {
 
       {/* Top Cities */}
       <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-6">주요 도시 (Popular Cities)</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-6">주요 도시 (Popular Cities)</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {topCities.map((loc) => (
             <CityCard
@@ -90,7 +90,7 @@ export default async function HomePage() {
 
       {/* Featured Categories by City */}
       <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-6">인기 검색 (Popular Searches)</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-6">인기 검색 (Popular Searches)</h2>
         <div className="flex flex-wrap gap-2">
           <QuickLink href="/ca/los-angeles/medical">Korean Doctors in Los Angeles</QuickLink>
           <QuickLink href="/ca/los-angeles/dental">Korean Dentists in Los Angeles</QuickLink>
@@ -108,7 +108,7 @@ export default async function HomePage() {
 
       {/* About Section */}
       <section className="bg-gray-50 rounded-lg p-6 mt-12">
-        <h2 className="text-lg font-semibold mb-4">한인맵 소개 (About HaninMap)</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">한인맵 소개 (About HaninMap)</h2>
         <p className="text-gray-600 text-sm leading-relaxed mb-3">
           한인맵은 미국 내 한인 업소를 쉽게 찾을 수 있는 종합 디렉토리입니다.
           한인 병원, 치과, 변호사, 식당 등 다양한 업종의 정보를 제공합니다.
@@ -184,7 +184,7 @@ async function GuideSection() {
   return (
     <section className="mb-12">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold">미국 생활 가이드 (Life in the US)</h2>
+        <h2 className="text-xl font-semibold text-gray-900">미국 생활 가이드 (Life in the US)</h2>
         <Link href="/guides" className="text-sm text-blue-600 hover:underline">
           전체 보기 &rarr;
         </Link>

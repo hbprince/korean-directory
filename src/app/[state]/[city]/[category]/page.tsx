@@ -457,7 +457,7 @@ async function RelatedGuides({
 
   return (
     <section className="mt-8 mb-8">
-      <h2 className="text-lg font-semibold mb-4">
+      <h2 className="text-lg font-semibold text-gray-900 mb-4">
         관련 가이드 ({categoryNameKo})
       </h2>
       <div className="grid gap-4 md:grid-cols-2">

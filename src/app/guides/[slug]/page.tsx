@@ -162,7 +162,7 @@ export default async function GuidePage({ params }: PageProps) {
         {/* Related Businesses Section */}
         {relatedBusinessStats.length > 0 && (
           <section className="mt-12 border-t border-gray-200 pt-8">
-            <h2 className="text-xl font-semibold mb-4">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
               관련 한인 {categoryNameKo} 찾기
             </h2>
             <div className="grid sm:grid-cols-2 gap-4">
