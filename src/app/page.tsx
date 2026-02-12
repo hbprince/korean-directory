@@ -106,6 +106,15 @@ export default async function HomePage() {
       {/* Guide Section */}
       <GuideSection />
 
+      {/* Top Trusted Businesses */}
+      <TopTrustedBusinesses />
+
+      {/* Latest Alerts */}
+      <LatestAlerts />
+
+      {/* Popular Guides */}
+      <PopularGuides />
+
       {/* About Section */}
       <section className="bg-gray-50 rounded-lg p-6 mt-12">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">한인맵 소개 (About HaninMap)</h2>
@@ -199,6 +208,165 @@ async function GuideSection() {
             <span className="inline-block px-2 py-0.5 text-xs bg-blue-50 text-blue-700 rounded mb-2">
               {guide.categorySlug}
             </span>
+            <p className="font-medium text-gray-900 mb-1">{guide.titleKo}</p>
+            <p className="text-sm text-gray-500 line-clamp-2">{guide.summary}</p>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+async function TopTrustedBusinesses() {
+  const trustScores = await prisma.trustScore.findMany({
+    orderBy: { engagementScore: 'desc' },
+    take: 5,
+    select: { businessId: true, totalScore: true },
+  });
+
+  if (trustScores.length === 0) return null;
+
+  const businessIds = trustScores.map((t) => parseInt(t.businessId, 10)).filter((id) => !isNaN(id));
+
+  const businesses = await prisma.business.findMany({
+    where: { id: { in: businessIds } },
+    select: {
+      id: true,
+      nameKo: true,
+      city: true,
+      slug: true,
+      primaryCategory: { select: { nameKo: true } },
+    },
+  });
+
+  // Maintain trust score ordering
+  const bizMap = new Map(businesses.map((b) => [String(b.id), b]));
+  const scoreMap = new Map(trustScores.map((t) => [t.businessId, t.totalScore]));
+  const ordered = trustScores
+    .map((t) => bizMap.get(t.businessId))
+    .filter(Boolean) as typeof businesses;
+
+  if (ordered.length === 0) return null;
+
+  return (
+    <section className="border-t pt-12 mt-12">
+      <h2 className="text-xl font-semibold text-gray-900 mb-6">
+        한인이 가장 많이 찾는 업체
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {ordered.map((biz) => {
+          const score = scoreMap.get(String(biz.id)) || 0;
+          return (
+            <Link
+              key={biz.id}
+              href={`/biz/${biz.slug || `business-${biz.id}`}`}
+              className="block p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all"
+            >
+              <p className="font-medium text-gray-900">{biz.nameKo}</p>
+              <p className="text-sm text-gray-500 mt-1">
+                {biz.city} &middot; {biz.primaryCategory.nameKo}
+              </p>
+              <span className={`inline-block mt-2 text-xs font-medium px-2 py-0.5 rounded-full ${
+                score >= 80
+                  ? 'bg-green-50 text-green-700'
+                  : score >= 60
+                    ? 'bg-yellow-50 text-yellow-700'
+                    : 'bg-gray-100 text-gray-600'
+              }`}>
+                신뢰점수 {Math.round(score)}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+async function LatestAlerts() {
+  const alerts = await prisma.alertFeed.findMany({
+    where: { status: 'published' },
+    orderBy: { publishedAt: 'desc' },
+    take: 3,
+    select: {
+      id: true,
+      slug: true,
+      titleKo: true,
+      severity: true,
+      publishedAt: true,
+    },
+  });
+
+  if (alerts.length === 0) return null;
+
+  const severityStyles: Record<string, string> = {
+    critical: 'bg-red-100 text-red-700',
+    warning: 'bg-yellow-100 text-yellow-700',
+    info: 'bg-blue-100 text-blue-700',
+  };
+
+  const severityLabels: Record<string, string> = {
+    critical: '긴급',
+    warning: '주의',
+    info: '안내',
+  };
+
+  return (
+    <section className="border-t pt-12 mt-12">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold text-gray-900">최신 알림</h2>
+        <Link href="/alerts" className="text-sm text-blue-600 hover:underline">
+          전체 알림 보기 &rarr;
+        </Link>
+      </div>
+      <div className="space-y-3">
+        {alerts.map((alert) => (
+          <Link
+            key={alert.id}
+            href={`/alerts/${alert.slug}`}
+            className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
+          >
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap ${
+              severityStyles[alert.severity] || severityStyles.info
+            }`}>
+              {severityLabels[alert.severity] || '안내'}
+            </span>
+            <p className="font-medium text-gray-900 flex-1 line-clamp-1">{alert.titleKo}</p>
+            <span className="text-xs text-gray-400 whitespace-nowrap">
+              {alert.publishedAt.toLocaleDateString('ko-KR')}
+            </span>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+async function PopularGuides() {
+  const guides = await prisma.guideContent.findMany({
+    where: { status: 'published' },
+    orderBy: { viewCount: 'desc' },
+    take: 3,
+    select: { slug: true, titleKo: true, summary: true },
+  });
+
+  if (guides.length === 0) return null;
+
+  return (
+    <section className="border-t pt-12 mt-12">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold text-gray-900">인기 가이드</h2>
+        <Link href="/guides" className="text-sm text-blue-600 hover:underline">
+          전체 보기 &rarr;
+        </Link>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {guides.map((guide) => (
+          <Link
+            key={guide.slug}
+            href={`/guides/${guide.slug}`}
+            className="block p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all"
+          >
             <p className="font-medium text-gray-900 mb-1">{guide.titleKo}</p>
             <p className="text-sm text-gray-500 line-clamp-2">{guide.summary}</p>
           </Link>

@@ -10,6 +10,7 @@ interface PhotoGalleryProps {
 
 export function PhotoGallery({ photoRefs, businessName }: PhotoGalleryProps) {
   const [failedRefs, setFailedRefs] = useState<Set<string>>(new Set());
+  const [loadedRefs, setLoadedRefs] = useState<Set<string>>(new Set());
 
   const visibleRefs = photoRefs.filter((ref) => !failedRefs.has(ref));
 
@@ -24,8 +25,13 @@ export function PhotoGallery({ photoRefs, businessName }: PhotoGalleryProps) {
             <img
               src={`/api/photo?ref=${encodeURIComponent(ref)}&maxwidth=800`}
               alt={`${businessName} - 사진 ${idx + 1}`}
-              className="w-full h-full object-cover"
+              className={`w-full h-full object-cover transition-opacity ${
+                loadedRefs.has(ref) ? 'opacity-100' : 'opacity-0'
+              }`}
               loading={idx === 0 ? 'eager' : 'lazy'}
+              onLoad={() => {
+                setLoadedRefs((prev) => new Set(prev).add(ref));
+              }}
               onError={() => {
                 setFailedRefs((prev) => new Set(prev).add(ref));
               }}

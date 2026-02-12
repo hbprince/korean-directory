@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import Link from 'next/link';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
+import { Providers } from './providers';
 import './globals.css';
 
 const geistSans = localFont({
@@ -34,9 +35,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white min-h-screen`}>
         <GoogleAnalytics />
-        <Header />
-        {children}
-        <Footer />
+        <Providers>
+          <Header />
+          {children}
+          <Footer />
+        </Providers>
       </body>
     </html>
   );
@@ -64,6 +67,9 @@ function Header() {
           </Link>
           <Link href="/australia/nsw/sydney/medical" className="text-gray-600 hover:text-gray-900">
             호주 (Australia)
+          </Link>
+          <Link href="/alerts" className="text-gray-600 hover:text-gray-900">
+            알림 (Alerts)
           </Link>
         </nav>
       </div>
@@ -106,6 +112,7 @@ function Footer() {
             <h4 className="font-medium text-gray-900 mb-3">바로가기 (Quick Links)</h4>
             <ul className="space-y-2 text-sm">
               <li><Link href="/regions" className="text-gray-600 hover:text-gray-900">전체 지역 (All Regions)</Link></li>
+              <li><Link href="/alerts" className="text-gray-600 hover:text-gray-900">생활 알림 (Alerts)</Link></li>
               <li><Link href="/sitemap.xml" className="text-gray-600 hover:text-gray-900">Sitemap</Link></li>
             </ul>
           </div>

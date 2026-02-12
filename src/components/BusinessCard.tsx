@@ -19,6 +19,9 @@ export interface BusinessCardProps {
   categorySlug: string;
   categoryNameEn: string;
   openNow?: boolean | null;
+  trustScore?: number;
+  communityMentions?: number;
+  upVotes?: number;
 }
 
 export function BusinessCard({
@@ -34,6 +37,9 @@ export function BusinessCard({
   reviewCount,
   categoryNameEn,
   openNow,
+  trustScore,
+  communityMentions,
+  upVotes,
 }: BusinessCardProps) {
   // Korean name as primary, English as secondary
   const displayName = formatBilingual(nameKo, nameEn);
@@ -77,6 +83,29 @@ export function BusinessCard({
           </span>
         )}
       </div>
+
+      {/* Trust Score & Community Signals */}
+      {(trustScore || communityMentions || upVotes) ? (
+        <div className="flex items-center flex-wrap gap-2 mt-2 text-xs">
+          {trustScore !== undefined && trustScore > 0 && (
+            <span className={`font-medium px-2 py-0.5 rounded-full ${
+              trustScore >= 80
+                ? 'bg-green-50 text-green-700'
+                : trustScore >= 60
+                  ? 'bg-yellow-50 text-yellow-700'
+                  : 'bg-gray-100 text-gray-600'
+            }`}>
+              한인 신뢰점수 {trustScore}
+            </span>
+          )}
+          {communityMentions !== undefined && communityMentions > 0 && (
+            <span className="text-gray-500">커뮤니티 {communityMentions}회 언급</span>
+          )}
+          {upVotes !== undefined && upVotes > 0 && (
+            <span className="text-gray-500">👍 {upVotes}</span>
+          )}
+        </div>
+      ) : null}
 
       <div className="flex items-center justify-end mt-2">
         {phoneRaw && (

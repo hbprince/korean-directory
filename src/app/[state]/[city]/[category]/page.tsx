@@ -42,6 +42,7 @@ interface PageProps {
   }>;
   searchParams: Promise<{
     page?: string;
+    sort?: string;
   }>;
 }
 
@@ -192,7 +193,10 @@ async function getCategoryInfo(slug: string): Promise<{
 
 export default async function CategoryPage({ params, searchParams }: PageProps) {
   const { state, city, category } = await params;
-  const { page: pageParam } = await searchParams;
+  const { page: pageParam, sort: sortParam } = await searchParams;
+  const sort = ['trust', 'rating', 'reviews', 'recent'].includes(sortParam || '')
+    ? sortParam!
+    : 'trust';
 
   const page = parseInt(pageParam || '1', 10);
   if (isNaN(page) || page < 1) notFound();
@@ -235,6 +239,29 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
 
   if (page > totalPages && totalPages > 0) notFound();
 
+  // Build sort order based on sort param
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const orderByMap: Record<string, any[]> = {
+    trust: [
+      { qualityScore: 'desc' },
+      { nameKo: 'asc' },
+    ],
+    rating: [
+      { googlePlace: { rating: { sort: 'desc', nulls: 'last' } } },
+      { qualityScore: 'desc' },
+      { nameKo: 'asc' },
+    ],
+    reviews: [
+      { googlePlace: { userRatingsTotal: { sort: 'desc', nulls: 'last' } } },
+      { qualityScore: 'desc' },
+      { nameKo: 'asc' },
+    ],
+    recent: [
+      { createdAt: 'desc' },
+      { nameKo: 'asc' },
+    ],
+  };
+
   // Fetch businesses with pagination
   const businesses = await prisma.business.findMany({
     where: whereClause,
@@ -248,14 +275,44 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
       },
       primaryCategory: true,
     },
-    orderBy: [
-      { googlePlace: { rating: { sort: 'desc', nulls: 'last' } } },
-      { qualityScore: 'desc' },
-      { nameKo: 'asc' },
-    ],
+    orderBy: orderByMap[sort] || orderByMap.trust,
     skip: (page - 1) * ITEMS_PER_PAGE,
     take: ITEMS_PER_PAGE,
   });
+
+  // Fetch trust score data for displayed businesses
+  const businessIds = businesses.map((b) => String(b.id));
+
+  const [trustScores, mentionAggs, upVoteAggs] = await Promise.all([
+    prisma.trustScore.findMany({
+      where: { businessId: { in: businessIds } },
+      select: { businessId: true, totalScore: true },
+    }),
+    prisma.communityMention.groupBy({
+      by: ['businessId'],
+      where: { businessId: { in: businessIds } },
+      _sum: { mentionCount: true },
+    }),
+    prisma.businessVote.groupBy({
+      by: ['businessId'],
+      where: { businessId: { in: businessIds }, voteType: 'up' },
+      _count: true,
+    }),
+  ]);
+
+  const trustMap = new Map(trustScores.map((t) => [t.businessId, t.totalScore]));
+  const mentionMap = new Map(mentionAggs.map((m) => [m.businessId, m._sum.mentionCount || 0]));
+  const upVoteMap = new Map(upVoteAggs.map((v) => [v.businessId, v._count]));
+
+  // If sorting by trust, re-sort businesses by trust score (since Prisma can't join TrustScore)
+  let sortedBusinesses = businesses;
+  if (sort === 'trust') {
+    sortedBusinesses = [...businesses].sort((a, b) => {
+      const scoreA = trustMap.get(String(a.id)) || 0;
+      const scoreB = trustMap.get(String(b.id)) || 0;
+      return scoreB - scoreA;
+    });
+  }
 
   // Fetch city data for CityFilter
   const cityData = await prisma.business.groupBy({
@@ -371,6 +428,9 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
           parentCategorySlug={categoryInfo.parentSlug}
         />
 
+        {/* Sort Options */}
+        <SortPills basePath={basePath} currentSort={sort} />
+
         {/* Business Cards + Pagination */}
         {businesses.length === 0 ? (
           <div className="text-center py-12 bg-gray-50 rounded-lg">
@@ -382,7 +442,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
         ) : (
           <>
             <div className="grid gap-4 md:grid-cols-2">
-              {businesses.map((business) => (
+              {sortedBusinesses.map((business) => (
                 <BusinessCard
                   key={business.id}
                   id={business.id}
@@ -399,6 +459,9 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
                   categorySlug={business.primaryCategory.slug}
                   categoryNameEn={business.primaryCategory.nameEn}
                   openNow={computeOpenNow(business.googlePlace?.openingHoursJson)}
+                  trustScore={trustMap.get(String(business.id))}
+                  communityMentions={mentionMap.get(String(business.id))}
+                  upVotes={upVoteMap.get(String(business.id))}
                 />
               ))}
             </div>
@@ -473,6 +536,37 @@ async function RelatedGuides({
         ))}
       </div>
     </section>
+  );
+}
+
+const SORT_OPTIONS = [
+  { key: 'trust', label: '신뢰점수순' },
+  { key: 'rating', label: '별점순' },
+  { key: 'reviews', label: '리뷰순' },
+  { key: 'recent', label: '최신순' },
+] as const;
+
+function SortPills({ basePath, currentSort }: { basePath: string; currentSort: string }) {
+  return (
+    <div className="flex flex-wrap gap-2 mb-4">
+      {SORT_OPTIONS.map((opt) => {
+        const isActive = opt.key === currentSort;
+        const href = opt.key === 'trust' ? basePath : `${basePath}?sort=${opt.key}`;
+        return (
+          <Link
+            key={opt.key}
+            href={href}
+            className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
+              isActive
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {opt.label}
+          </Link>
+        );
+      })}
+    </div>
   );
 }
 

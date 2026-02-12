@@ -258,3 +258,143 @@ model GuideContent {
   @@index([categorySlug])
   @@index([status])
 }
+
+// ─── 업체 참여 트래킹 ───
+model BusinessEngagement {
+  id         Int      @id @default(autoincrement())
+  businessId String
+  eventType  String // "view" | "phone_click" | "website_click" | "guide_click"
+  sessionId  String?
+  createdAt  DateTime @default(now())
+
+  @@index([businessId, eventType])
+  @@index([createdAt])
+}
+
+// ─── 커뮤니티 멘션 카운트 ───
+model CommunityMention {
+  id                  Int      @id @default(autoincrement())
+  businessId          String
+  source              String // "radiokorea" | "heykorean" | "missyusa" | "instagram" | "yelp" | "reddit"
+  mentionCount        Int      @default(0)
+  externalRating      Float?
+  externalReviewCount Int?
+  lastCrawledAt       DateTime
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@unique([businessId, source])
+  @@index([businessId])
+}
+
+// ─── 종합 신뢰점수 ───
+model TrustScore {
+  id              Int      @id @default(autoincrement())
+  businessId      String   @unique
+  communityScore  Float    @default(0)
+  externalScore   Float    @default(0)
+  engagementScore Float    @default(0)
+  reviewScore     Float    @default(0)
+  totalScore      Float    @default(0)
+  rank            Int?
+  calculatedAt    DateTime @default(now())
+
+  @@index([totalScore(sort: Desc)])
+}
+
+// ─── 👍👎 투표 ───
+model BusinessVote {
+  id          Int      @id @default(autoincrement())
+  businessId  String
+  voteType    String // "up" | "down"
+  fingerprint String
+  ipHash      String
+  createdAt   DateTime @default(now())
+
+  @@unique([businessId, fingerprint])
+  @@index([businessId])
+}
+
+// ─── 한줄 리뷰 ───
+model Review {
+  id           Int      @id @default(autoincrement())
+  businessId   String
+  userId       String
+  rating       Int
+  content      String   @db.VarChar(200)
+  tags         Json     @default("[]")
+  status       String   @default("active")
+  helpfulCount Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([businessId, userId])
+  @@index([businessId, status])
+  @@index([createdAt])
+}
+
+// ─── NextAuth 사용자 ───
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  provider      String?
+  accounts      Account[]
+  sessions      Session[]
+  reviews       Review[]
+  createdAt     DateTime  @default(now())
+
+  @@index([email])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─── 월간 알림 피드 ───
+model AlertFeed {
+  id           Int      @id @default(autoincrement())
+  slug         String   @unique
+  source       String
+  titleKo      String
+  titleEn      String?
+  summaryKo    String   @db.Text
+  contentKo    String?  @db.Text
+  sourceUrl    String
+  severity     String   @default("info")
+  categorySlug String?
+  publishedAt  DateTime
+  status       String   @default("draft")
+  createdAt    DateTime @default(now())
+
+  @@index([source, publishedAt(sort: Desc)])
+  @@index([status])
+}

@@ -8,6 +8,7 @@ export async function GET() {
   const urls = [
     { loc: BASE_URL, changefreq: 'daily', priority: '1.0' },
     { loc: `${BASE_URL}/regions`, changefreq: 'weekly', priority: '0.9' },
+    { loc: `${BASE_URL}/alerts`, changefreq: 'weekly', priority: '0.7' },
   ];
 
   let xml = `<?xml version="1.0" encoding="UTF-8"?>

@@ -14,6 +14,10 @@ import {
   buildBusinessBreadcrumbs,
 } from '@/lib/seo/meta';
 import { PhotoGallery } from '@/components/PhotoGallery';
+import { TrackingWrapper } from '@/components/TrackingWrapper';
+import { BusinessVote } from '@/components/BusinessVote';
+import { TrustScoreDetail } from '@/components/TrustScoreDetail';
+import { ReviewSection } from '@/components/ReviewSection';
 import { formatBilingual, UI_LABELS } from '@/lib/i18n/labels';
 import { getCountryByCode, getIntlRegionNameEn } from '@/lib/i18n/countries';
 import { computeOpenNow } from '@/lib/enrichment/helpers';
@@ -112,15 +116,19 @@ export default async function BusinessPage({ params }: PageProps) {
   const googlePlace = business.googlePlace;
 
   // Extract photo references from stored URLs (strip API keys for security)
+  // Only enable photos if GOOGLE_MAPS_API_KEY is configured
+  const hasPhotoApiKey = !!process.env.GOOGLE_MAPS_API_KEY;
   const rawPhotos = googlePlace?.photosJson as Array<{ url: string; width: number; height: number }> | null;
-  const photoRefs = (rawPhotos || [])
-    .map((p) => {
-      try {
-        const u = new URL(p.url);
-        return u.searchParams.get('photoreference');
-      } catch { return null; }
-    })
-    .filter((ref): ref is string => !!ref);
+  const photoRefs = hasPhotoApiKey
+    ? (rawPhotos || [])
+        .map((p) => {
+          try {
+            const u = new URL(p.url);
+            return u.searchParams.get('photoreference');
+          } catch { return null; }
+        })
+        .filter((ref): ref is string => !!ref)
+    : [];
   // First photo proxy URL for schema image
   const firstPhotoUrl = photoRefs.length > 0
     ? `https://www.haninmap.com/api/photo?ref=${encodeURIComponent(photoRefs[0])}&maxwidth=800`
@@ -212,8 +220,8 @@ export default async function BusinessPage({ params }: PageProps) {
               <div className="flex items-center text-sm">
                 <span className="text-yellow-500 mr-1">★</span>
                 <span className="font-medium">{googlePlace.rating.toFixed(1)}</span>
-                <span className="text-gray-400 ml-1">
-                  ({googlePlace.userRatingsTotal} reviews)
+                <span className="text-gray-500 ml-1">
+                  ({googlePlace.userRatingsTotal}개 리뷰)
                 </span>
               </div>
             )}
@@ -230,8 +238,12 @@ export default async function BusinessPage({ params }: PageProps) {
                 </span>
               );
             })()}
+            <BusinessVote businessId={String(business.id)} />
           </div>
         </header>
+
+        {/* Trust Score Breakdown */}
+        <TrustScoreDetail businessId={String(business.id)} />
 
         {/* Photo Gallery - proxied through /api/photo to hide API key */}
         {photoRefs.length > 0 && (
@@ -248,38 +260,16 @@ export default async function BusinessPage({ params }: PageProps) {
                 <dd className="text-gray-900">{business.addressRaw}</dd>
               </div>
 
-              {(business.phoneRaw || business.phoneE164) && (
-                <div>
-                  <dt className="text-sm text-gray-500">{UI_LABELS.phone.ko} ({UI_LABELS.phone.en})</dt>
-                  <dd>
-                    <a
-                      href={`tel:${business.phoneE164 || business.phoneRaw}`}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      {business.phoneRaw || business.phoneE164}
-                    </a>
-                  </dd>
-                </div>
-              )}
-
-              {googlePlace?.website && (
-                <div>
-                  <dt className="text-sm text-gray-500">{UI_LABELS.website.ko} ({UI_LABELS.website.en})</dt>
-                  <dd>
-                    <a
-                      href={googlePlace.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      {(() => {
-                        try { return new URL(googlePlace.website).hostname; }
-                        catch { return googlePlace.website; }
-                      })()}
-                    </a>
-                  </dd>
-                </div>
-              )}
+              <TrackingWrapper
+                businessId={String(business.id)}
+                phone={(business.phoneRaw || business.phoneE164) ? (business.phoneE164 || business.phoneRaw) : undefined}
+                phoneDisplay={business.phoneRaw || business.phoneE164}
+                phoneLabel={`${UI_LABELS.phone.ko} (${UI_LABELS.phone.en})`}
+                website={googlePlace?.website}
+                websiteLabel={`${UI_LABELS.website.ko} (${UI_LABELS.website.en})`}
+              >
+                {null}
+              </TrackingWrapper>
             </dl>
           </div>
 
@@ -301,17 +291,21 @@ export default async function BusinessPage({ params }: PageProps) {
         {/* Map */}
         {(googlePlace?.lat && googlePlace?.lng) || (business.lat && business.lng) ? (
           <section className="mb-8">
-            <h2 className="text-lg font-semibold mb-4">Location</h2>
-            <div className="bg-gray-100 rounded-lg p-4 text-center">
+            <h2 className="text-lg font-semibold mb-4">위치 (Location)</h2>
+            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <p className="text-sm text-gray-700 mb-3">{business.addressRaw}</p>
               <a
                 href={googlePlace?.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
                   `${displayName} ${business.addressRaw}`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors text-sm text-gray-700"
               >
-                View on Google Maps
+                <svg className="w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                Google 지도에서 보기
               </a>
             </div>
           </section>
@@ -329,6 +323,9 @@ export default async function BusinessPage({ params }: PageProps) {
         />
 
         <FAQSection faqs={faqs} />
+
+        {/* Community Reviews */}
+        <ReviewSection businessId={String(business.id)} />
 
         {/* Last Updated */}
         {googlePlace?.lastFetchedAt && (
@@ -380,7 +377,7 @@ async function RelatedBusinesses({
 
   return (
     <section className="mt-12 border-t border-gray-200 pt-8">
-      <h2 className="text-lg font-semibold mb-4">Similar Businesses Nearby</h2>
+      <h2 className="text-lg font-semibold mb-4">주변 유사 업체</h2>
       <div className="grid sm:grid-cols-2 gap-4">
         {related.map((biz) => (
           <Link
