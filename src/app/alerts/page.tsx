@@ -171,6 +171,7 @@ function AlertCard({
 }: {
   alert: {
     id: number;
+    slug: string;
     titleKo: string;
     summaryKo: string;
     source: string;
@@ -180,7 +181,7 @@ function AlertCard({
   };
 }) {
   return (
-    <article className="block p-5 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
+    <article id={alert.slug} className="block p-5 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors scroll-mt-24">
       {/* Badges row */}
       <div className="flex items-center gap-2 mb-3">
         <SeverityBadge severity={alert.severity} />

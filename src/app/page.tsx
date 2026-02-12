@@ -323,7 +323,7 @@ async function LatestAlerts() {
         {alerts.map((alert) => (
           <Link
             key={alert.id}
-            href={`/alerts/${alert.slug}`}
+            href={`/alerts#${alert.slug}`}
             className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
           >
             <span className={`text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap ${
