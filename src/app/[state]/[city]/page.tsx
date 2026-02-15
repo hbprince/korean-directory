@@ -6,7 +6,6 @@ import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { JsonLd } from '@/components/JsonLd';
 import { buildBreadcrumbList, type BreadcrumbItem } from '@/lib/seo/meta';
 import { getCityNameKo, getStateNameKo } from '@/lib/i18n/labels';
-import { PRIMARY_CATEGORIES } from '@/lib/taxonomy/categories';
 import { isMalformedCity } from '@/lib/seo/slug-utils';
 
 export const revalidate = 86400; // 24 hours

@@ -47,7 +47,7 @@ export function generateL1Metadata(params: {
   categoryDescriptionEn?: string;
   page?: number;
 }): Metadata {
-  const { city, state, categoryNameEn, categoryNameKo, count, categorySlug, categoryDescriptionKo, categoryDescriptionEn, page } = params;
+  const { city, state, categoryNameEn, categoryNameKo, count, categorySlug, categoryDescriptionKo, page } = params;
   const cityDisplay = toTitleCase(city.replace(/-/g, ' '));
   const cityKo = getCityNameKo(city);
   const stateDisplay = state.toUpperCase();
@@ -104,7 +104,7 @@ export function generateL2Metadata(params: {
   subcategoryDescriptionEn?: string;
   page?: number;
 }): Metadata {
-  const { city, state, subcategoryNameEn, subcategoryNameKo, count, subcategorySlug, subcategoryDescriptionKo, subcategoryDescriptionEn, page } = params;
+  const { city, state, subcategoryNameEn, subcategoryNameKo, count, subcategorySlug, subcategoryDescriptionKo, page } = params;
   const cityDisplay = toTitleCase(city.replace(/-/g, ' '));
   const cityKo = getCityNameKo(city);
   const stateDisplay = state.toUpperCase();
@@ -378,7 +378,7 @@ export function buildCategoryBreadcrumbs(params: {
   categoryNameKo: string;
   categorySlug: string;
 }): BreadcrumbItem[] {
-  const { state, city, categoryNameEn, categoryNameKo, categorySlug } = params;
+  const { state, city, categoryNameKo, categorySlug } = params;
   const cityDisplay = toTitleCase(city.replace(/-/g, ' '));
   const cityKo = getCityNameKo(city);
   const stateDisplay = state.toUpperCase();
@@ -399,7 +399,7 @@ export function buildBusinessBreadcrumbs(params: {
   businessName: string;
   businessSlug: string;
 }): BreadcrumbItem[] {
-  const { state, city, categoryNameEn, categoryNameKo, categorySlug, businessName, businessSlug } = params;
+  const { state, city, categoryNameKo, categorySlug, businessName, businessSlug } = params;
   const cityDisplay = toTitleCase(city.replace(/-/g, ' '));
   const cityKo = getCityNameKo(city);
   const stateDisplay = state.toUpperCase();

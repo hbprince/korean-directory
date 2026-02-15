@@ -30,8 +30,8 @@ export function FAQSection({ faqs }: FAQSectionProps) {
 }
 
 // Category-specific FAQ questions (unique per category to avoid duplicate content)
-const CATEGORY_SPECIFIC_FAQS: Record<string, (cityKo: string, cityDisplay: string) => FAQItem[]> = {
-  medical: (cityKo, cityDisplay) => [
+const CATEGORY_SPECIFIC_FAQS: Record<string, (cityKo: string) => FAQItem[]> = {
+  medical: (cityKo) => [
     {
       question: `${cityKo} 한인 병원에서 보험 상담이 가능한가요?`,
       answer: `대부분의 ${cityKo} 한인 병원은 주요 보험을 취급하며, 한국어로 보험 관련 상담을 받을 수 있습니다. 방문 전 전화로 본인의 보험 적용 여부를 확인하시는 것을 권장합니다.`,
@@ -41,7 +41,7 @@ const CATEGORY_SPECIFIC_FAQS: Record<string, (cityKo: string, cityDisplay: strin
       answer: `한인맵에서 ${cityKo} 지역의 한인 병원 목록을 확인하세요. 모든 등록 업체는 한국어 상담이 가능하며, 평점과 리뷰를 참고하여 선택할 수 있습니다.`,
     },
   ],
-  dental: (cityKo, cityDisplay) => [
+  dental: (cityKo) => [
     {
       question: `${cityKo}에서 한국어가 통하는 치과를 찾으려면?`,
       answer: `한인맵에서 ${cityKo} 한인 치과 목록을 확인하세요. 임플란트, 교정, 일반 치료 등 한국어로 상세한 설명을 들을 수 있는 치과를 찾을 수 있습니다.`,
@@ -51,7 +51,7 @@ const CATEGORY_SPECIFIC_FAQS: Record<string, (cityKo: string, cityDisplay: strin
       answer: `대부분의 한인 치과는 PPO, HMO 등 주요 치과 보험을 취급합니다. 보험 미가입자를 위한 할인 프로그램을 운영하는 치과도 있으니 직접 문의하세요.`,
     },
   ],
-  legal: (cityKo, cityDisplay) => [
+  legal: (cityKo) => [
     {
       question: `${cityKo}에서 한국어 상담 가능한 변호사는 어디서 찾나요?`,
       answer: `한인맵에서 ${cityKo} 한인 변호사 목록을 확인하세요. 이민법, 사업법, 가정법, 형사법 등 전문 분야별로 한국어 상담이 가능한 변호사를 찾을 수 있습니다.`,
@@ -61,7 +61,7 @@ const CATEGORY_SPECIFIC_FAQS: Record<string, (cityKo: string, cityDisplay: strin
       answer: `이민법 전문 한인 변호사에게 상담하시면 비자, 영주권, 시민권 신청 등의 절차를 한국어로 정확하게 안내받을 수 있습니다. 한인맵에서 전문 분야를 확인하세요.`,
     },
   ],
-  food: (cityKo, cityDisplay) => [
+  food: (cityKo) => [
     {
       question: `${cityKo}에서 맛있는 한식당을 어떻게 찾나요?`,
       answer: `한인맵에서 ${cityKo} 한인 식당 목록을 확인하세요. Google 평점과 리뷰 수를 기반으로 정렬되어 인기 있는 식당을 쉽게 찾을 수 있습니다.`,
@@ -71,7 +71,7 @@ const CATEGORY_SPECIFIC_FAQS: Record<string, (cityKo: string, cityDisplay: strin
       answer: `한인맵의 식품/쇼핑 카테고리에서 한인 마트와 식품점을 찾을 수 있습니다. 한국 식재료, 반찬, 냉동식품 등을 구매할 수 있는 매장을 확인하세요.`,
     },
   ],
-  insurance: (cityKo, cityDisplay) => [
+  insurance: (cityKo) => [
     {
       question: `${cityKo}에서 한국어로 보험 상담 받을 수 있는 곳은?`,
       answer: `한인맵에서 ${cityKo} 한인 보험 에이전트 목록을 확인하세요. 건강보험, 자동차보험, 생명보험, 사업자보험 등 다양한 보험을 한국어로 상담받을 수 있습니다.`,
@@ -81,7 +81,7 @@ const CATEGORY_SPECIFIC_FAQS: Record<string, (cityKo: string, cityDisplay: strin
       answer: `건강보험과 자동차보험이 가장 기본입니다. 한인 보험 에이전트는 미국 보험 제도를 한국어로 쉽게 설명해 드리며, 본인 상황에 맞는 최적의 플랜을 추천합니다.`,
     },
   ],
-  'real-estate': (cityKo, cityDisplay) => [
+  'real-estate': (cityKo) => [
     {
       question: `${cityKo}에서 한인 부동산 에이전트를 찾으려면?`,
       answer: `한인맵에서 ${cityKo} 한인 부동산 목록을 확인하세요. 매매, 임대, 투자 등 한국어로 상담 가능한 부동산 에이전트가 등록되어 있습니다.`,
@@ -110,7 +110,7 @@ export function generateCategoryFAQs(params: {
   const catKey = categoryNameEn.toLowerCase().replace(/\s+/g, '-');
 
   // Category-specific FAQs (unique per category)
-  const specificFaqs = CATEGORY_SPECIFIC_FAQS[catKey]?.(cityKo, cityDisplay) || [];
+  const specificFaqs = CATEGORY_SPECIFIC_FAQS[catKey]?.(cityKo) || [];
 
   // Common FAQs (always included)
   const commonFaqs: FAQItem[] = [
