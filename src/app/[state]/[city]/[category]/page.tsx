@@ -115,8 +115,9 @@ export async function generateStaticParams() {
   return params;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
   const { state, city, category } = await params;
+  const { page: pageParam } = await searchParams;
 
   // Get category info
   const categoryInfo = await getCategoryInfo(category);
@@ -136,6 +137,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
   });
 
+  const page = parseInt(pageParam || '1', 10) || 1;
+
   if (categoryInfo.level === 'primary') {
     const taxonomyData = getPrimaryCategory(category);
     return generateL1Metadata({
@@ -147,6 +150,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       categorySlug: categoryInfo.slug,
       categoryDescriptionKo: taxonomyData?.descriptionKo,
       categoryDescriptionEn: taxonomyData?.descriptionEn,
+      page,
     });
   } else {
     const taxonomyData = getSubcategory(category);
@@ -160,6 +164,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       subcategorySlug: categoryInfo.slug,
       subcategoryDescriptionKo: taxonomyData?.subcategory.descriptionKo,
       subcategoryDescriptionEn: taxonomyData?.subcategory.descriptionEn,
+      page,
     });
   }
 }

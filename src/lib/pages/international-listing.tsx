@@ -61,6 +61,7 @@ export async function generateIntlMetadata(
   region: string,
   city: string,
   category: string,
+  page?: number,
 ): Promise<Metadata> {
   const countryConfig = getCountryBySlug(countrySlug);
   if (!countryConfig) return {};
@@ -92,7 +93,8 @@ export async function generateIntlMetadata(
     ? `${countryConfig.nameKo} ${cityKo} 한인 ${categoryInfo.nameKo} ${count}곳. Korean ${categoryInfo.nameEn.toLowerCase()} in ${cityDisplay}, ${countryConfig.nameEn}. 전화번호, 주소, 평점.`
     : `${countryConfig.nameKo} ${cityKo} 한인 ${categoryInfo.nameKo}. Find Korean ${categoryInfo.nameEn.toLowerCase()} in ${cityDisplay}, ${countryConfig.nameEn}.`;
 
-  const url = `${BASE_URL}/${countrySlug}/${region}/${city}/${category}`;
+  const baseUrl = `${BASE_URL}/${countrySlug}/${region}/${city}/${category}`;
+  const url = page && page > 1 ? `${baseUrl}?page=${page}` : baseUrl;
 
   return {
     title,
@@ -108,7 +110,7 @@ export async function generateIntlMetadata(
     },
     alternates: {
       canonical: url,
-      languages: { ko: url, en: url, 'x-default': url },
+      languages: { ko: url, 'x-default': url },
     },
   };
 }

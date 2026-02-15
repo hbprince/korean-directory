@@ -66,23 +66,29 @@ export function CategoryIntro({
 
   return (
     <section className="mb-8 p-5 bg-gray-50 rounded-lg border border-gray-100">
-      {/* Korean primary */}
+      {/* Question-based heading for AI citation */}
+      <h2 className="text-base font-semibold text-gray-800 mb-3">
+        {cityKo}에서 한인 {categoryNameKo}은 어떻게 찾나요?
+      </h2>
+
+      {/* Korean answer block (self-contained, 134-167 words target) */}
       <div className="mb-4">
         <p className="text-gray-700 text-sm leading-relaxed">
-          {stateKo} {cityKo}에서 한인 {categoryNameKo} 업소를 찾고 계신가요?
-          한인맵에 {count > 0 ? `${count.toLocaleString()}곳의` : ''} {categoryNameKo} 업체가 등록되어 있습니다.{' '}
+          {stateKo} {cityKo}에서 한인 {categoryNameKo}을 찾으려면 한인맵(HaninMap)을 이용하세요.
+          {count > 0 ? ` 현재 ${count.toLocaleString()}곳의 한인 ${categoryNameKo} 업체가 등록되어 있습니다.` : ''}{' '}
           {contextKo}{' '}
-          여러 한인 커뮤니티 디렉토리에서 수집한 정보이며, Google Places 데이터로 검증하여 전화번호, 주소, 평점을 제공합니다.
+          한인맵은 여러 한인 커뮤니티 디렉토리에서 수집한 정보를 Google Places 데이터로 검증하여 전화번호, 주소, 평점, 영업시간을 제공합니다.
+          신뢰도 점수와 커뮤니티 리뷰를 참고하면 더 나은 선택을 할 수 있습니다.
         </p>
       </div>
 
-      {/* English secondary */}
+      {/* English answer block */}
       <div>
         <p className="text-gray-500 text-xs leading-relaxed">
-          Looking for Korean {categoryNameEn.toLowerCase()} in {cityDisplay}, {stateDisplay}?
-          {count > 0 ? ` HaninMap lists ${count.toLocaleString()} ${categoryNameEn.toLowerCase()} businesses.` : ''}
+          To find Korean {categoryNameEn.toLowerCase()} in {cityDisplay}, {stateDisplay}, use HaninMap.
+          {count > 0 ? ` We list ${count.toLocaleString()} verified ${categoryNameEn.toLowerCase()} businesses.` : ''}
           {' '}{contextEn}
-          {' '}Listings are sourced from Korean community directories and verified with Google Places data.
+          {' '}All listings are sourced from Korean community directories and verified with Google Places data, providing phone numbers, addresses, ratings, and hours.
         </p>
       </div>
     </section>

@@ -19,13 +19,12 @@ export function canonicalUrl(...segments: string[]): string {
   return `${BASE_URL}/${segments.map(s => s.toLowerCase()).join('/')}`;
 }
 
-/** Shared hreflang alternates – same URL serves both languages */
+/** Shared hreflang alternates – single bilingual page, ko primary */
 function hreflangAlternates(url: string) {
   return {
     canonical: url,
     languages: {
       'ko': url,
-      'en': url,
       'x-default': url,
     },
   };
@@ -46,8 +45,9 @@ export function generateL1Metadata(params: {
   categorySlug?: string;
   categoryDescriptionKo?: string;
   categoryDescriptionEn?: string;
+  page?: number;
 }): Metadata {
-  const { city, state, categoryNameEn, categoryNameKo, count, categorySlug, categoryDescriptionKo, categoryDescriptionEn } = params;
+  const { city, state, categoryNameEn, categoryNameKo, count, categorySlug, categoryDescriptionKo, categoryDescriptionEn, page } = params;
   const cityDisplay = toTitleCase(city.replace(/-/g, ' '));
   const cityKo = getCityNameKo(city);
   const stateDisplay = state.toUpperCase();
@@ -68,7 +68,8 @@ export function generateL1Metadata(params: {
   }
 
   const slug = categorySlug || categoryNameEn.toLowerCase().replace(/\s+/g, '-');
-  const url = canonicalUrl(state, city, slug);
+  const baseUrl = canonicalUrl(state, city, slug);
+  const url = page && page > 1 ? `${baseUrl}?page=${page}` : baseUrl;
 
   // noindex thin content pages (fewer than MIN_LISTINGS_FOR_INDEX businesses)
   const robots = count >= MIN_LISTINGS_FOR_INDEX ? 'index,follow' : 'noindex,follow';
@@ -101,8 +102,9 @@ export function generateL2Metadata(params: {
   subcategorySlug?: string;
   subcategoryDescriptionKo?: string;
   subcategoryDescriptionEn?: string;
+  page?: number;
 }): Metadata {
-  const { city, state, subcategoryNameEn, subcategoryNameKo, count, subcategorySlug, subcategoryDescriptionKo, subcategoryDescriptionEn } = params;
+  const { city, state, subcategoryNameEn, subcategoryNameKo, count, subcategorySlug, subcategoryDescriptionKo, subcategoryDescriptionEn, page } = params;
   const cityDisplay = toTitleCase(city.replace(/-/g, ' '));
   const cityKo = getCityNameKo(city);
   const stateDisplay = state.toUpperCase();
@@ -121,7 +123,8 @@ export function generateL2Metadata(params: {
   }
 
   const slug = subcategorySlug || subcategoryNameEn.toLowerCase().replace(/\s+/g, '-');
-  const url = canonicalUrl(state, city, slug);
+  const baseUrl = canonicalUrl(state, city, slug);
+  const url = page && page > 1 ? `${baseUrl}?page=${page}` : baseUrl;
 
   // noindex thin content pages (fewer than MIN_LISTINGS_FOR_INDEX businesses)
   const robots = count >= MIN_LISTINGS_FOR_INDEX ? 'index,follow' : 'noindex,follow';
