@@ -15,9 +15,19 @@ const MIN_BUSINESS_COUNT = 3;
 
 export async function GET() {
   try {
-    const urls: Array<{ loc: string; changefreq: string; priority: string }> = [];
+    const urls: Array<{ loc: string; lastmod?: string }> = [];
     const addedUrls = new Set<string>();
     let skippedMalformed = 0;
+
+    // Get the latest business update date for lastmod
+    const latestBusiness = await prisma.business.findFirst({
+      where: { countryCode: 'US' },
+      orderBy: { updatedAt: 'desc' },
+      select: { updatedAt: true },
+    });
+    const defaultLastmod = latestBusiness?.updatedAt
+      ? latestBusiness.updatedAt.toISOString().split('T')[0]
+      : new Date().toISOString().split('T')[0];
 
     const categories = await prisma.category.findMany({
       select: { id: true, slug: true, level: true },
@@ -48,7 +58,7 @@ export async function GET() {
       if (!url || addedUrls.has(url)) continue;
 
       addedUrls.add(url);
-      urls.push({ loc: url, changefreq: 'weekly', priority: '0.8' });
+      urls.push({ loc: url, lastmod: defaultLastmod });
     }
 
     // US Subcategories
@@ -75,7 +85,7 @@ export async function GET() {
       if (!url || addedUrls.has(url)) continue;
 
       addedUrls.add(url);
-      urls.push({ loc: url, changefreq: 'weekly', priority: '0.7' });
+      urls.push({ loc: url, lastmod: defaultLastmod });
     }
 
     let xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -84,9 +94,7 @@ export async function GET() {
 
     for (const url of urls) {
       xml += `  <url>
-    <loc>${url.loc}</loc>
-    <changefreq>${url.changefreq}</changefreq>
-    <priority>${url.priority}</priority>
+    <loc>${url.loc}</loc>${url.lastmod ? `\n    <lastmod>${url.lastmod}</lastmod>` : ''}
   </url>
 `;
     }

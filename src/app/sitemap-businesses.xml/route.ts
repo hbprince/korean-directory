@@ -22,7 +22,7 @@ function normalizeSlug(value: string | null | undefined): string | null {
 
 export async function GET() {
   try {
-    const urls: Array<{ loc: string; changefreq: string; priority: string; lastmod?: string }> = [];
+    const urls: Array<{ loc: string; lastmod?: string }> = [];
     const addedUrls = new Set<string>();
 
     const indexableBusinesses = await prisma.business.findMany({
@@ -51,8 +51,6 @@ export async function GET() {
       addedUrls.add(url);
       urls.push({
         loc: url,
-        changefreq: 'monthly',
-        priority: '0.6',
         lastmod: biz.updatedAt.toISOString().split('T')[0],
       });
     }
@@ -69,8 +67,6 @@ export async function GET() {
     <lastmod>${url.lastmod}</lastmod>`;
       }
       xml += `
-    <changefreq>${url.changefreq}</changefreq>
-    <priority>${url.priority}</priority>
   </url>
 `;
     }

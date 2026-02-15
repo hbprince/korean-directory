@@ -57,9 +57,9 @@ export function BusinessCard({
   return (
     <article className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
       <Link href={`/biz/${slug}`} className="block">
-        <h2 className="text-lg font-semibold text-gray-900 hover:text-blue-600">
+        <h3 className="text-lg font-semibold text-gray-900 hover:text-blue-600">
           {displayName}
-        </h2>
+        </h3>
       </Link>
 
       <p className="text-sm text-gray-600 mt-1 line-clamp-1">{addressRaw}</p>

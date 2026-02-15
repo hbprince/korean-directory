@@ -20,20 +20,18 @@ export async function GET() {
     },
   });
 
+  const latestGuide = guides.length > 0
+    ? guides.reduce((latest, g) => g.updatedAt > latest.updatedAt ? g : latest).updatedAt
+    : new Date();
+
   const urls = [
-    // Guides listing page
     {
       loc: `${BASE_URL}/guides`,
-      lastmod: new Date().toISOString().split('T')[0],
-      changefreq: 'weekly',
-      priority: '0.7',
+      lastmod: latestGuide.toISOString().split('T')[0],
     },
-    // Individual guide pages
     ...guides.map(guide => ({
       loc: `${BASE_URL}/guides/${guide.slug}`,
       lastmod: guide.updatedAt.toISOString().split('T')[0],
-      changefreq: 'monthly' as const,
-      priority: '0.8',
     })),
   ];
 
@@ -45,8 +43,6 @@ export async function GET() {
     xml += `  <url>
     <loc>${url.loc}</loc>
     <lastmod>${url.lastmod}</lastmod>
-    <changefreq>${url.changefreq}</changefreq>
-    <priority>${url.priority}</priority>
   </url>
 `;
   }

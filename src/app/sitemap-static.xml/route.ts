@@ -5,10 +5,11 @@ export const dynamic = 'force-dynamic';
 const BASE_URL = 'https://www.haninmap.com';
 
 export async function GET() {
+  const today = new Date().toISOString().split('T')[0];
   const urls = [
-    { loc: BASE_URL, changefreq: 'daily', priority: '1.0' },
-    { loc: `${BASE_URL}/regions`, changefreq: 'weekly', priority: '0.9' },
-    { loc: `${BASE_URL}/alerts`, changefreq: 'weekly', priority: '0.7' },
+    { loc: BASE_URL, lastmod: today },
+    { loc: `${BASE_URL}/regions`, lastmod: today },
+    { loc: `${BASE_URL}/alerts`, lastmod: today },
   ];
 
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -18,8 +19,7 @@ export async function GET() {
   for (const url of urls) {
     xml += `  <url>
     <loc>${url.loc}</loc>
-    <changefreq>${url.changefreq}</changefreq>
-    <priority>${url.priority}</priority>
+    <lastmod>${url.lastmod}</lastmod>
   </url>
 `;
   }

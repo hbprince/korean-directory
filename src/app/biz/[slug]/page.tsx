@@ -150,6 +150,7 @@ export default async function BusinessPage({ params }: PageProps) {
     lat: googlePlace?.lat || business.lat,
     lng: googlePlace?.lng || business.lng,
     categoryNameEn: business.primaryCategory.nameEn,
+    categorySlug: business.primaryCategory.slug,
     website: googlePlace?.website,
     rating: googlePlace?.rating,
     reviewCount: googlePlace?.userRatingsTotal,

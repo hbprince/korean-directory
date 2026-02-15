@@ -38,7 +38,7 @@ function buildIntlUrl(
 
 export async function GET() {
   try {
-    const urls: Array<{ loc: string; changefreq: string; priority: string }> = [];
+    const urls: Array<{ loc: string; lastmod?: string }> = [];
     const addedUrls = new Set<string>();
     let skippedMalformed = 0;
 
@@ -50,6 +50,16 @@ export async function GET() {
     const intlCountries = getAllCountries();
 
     for (const countryConfig of intlCountries) {
+      // Get latest update for this country
+      const latestIntl = await prisma.business.findFirst({
+        where: { countryCode: countryConfig.code },
+        orderBy: { updatedAt: 'desc' },
+        select: { updatedAt: true },
+      });
+      const countryLastmod = latestIntl?.updatedAt
+        ? latestIntl.updatedAt.toISOString().split('T')[0]
+        : new Date().toISOString().split('T')[0];
+
       // Primary categories
       const intlPrimaryCounts = await prisma.business.groupBy({
         by: ['city', 'state', 'primaryCategoryId'],
@@ -74,7 +84,7 @@ export async function GET() {
         if (!url || addedUrls.has(url)) continue;
 
         addedUrls.add(url);
-        urls.push({ loc: url, changefreq: 'weekly', priority: '0.7' });
+        urls.push({ loc: url, lastmod: countryLastmod });
       }
 
       // Subcategories
@@ -101,7 +111,7 @@ export async function GET() {
         if (!url || addedUrls.has(url)) continue;
 
         addedUrls.add(url);
-        urls.push({ loc: url, changefreq: 'weekly', priority: '0.6' });
+        urls.push({ loc: url, lastmod: countryLastmod });
       }
     }
 
@@ -111,9 +121,7 @@ export async function GET() {
 
     for (const url of urls) {
       xml += `  <url>
-    <loc>${url.loc}</loc>
-    <changefreq>${url.changefreq}</changefreq>
-    <priority>${url.priority}</priority>
+    <loc>${url.loc}</loc>${url.lastmod ? `\n    <lastmod>${url.lastmod}</lastmod>` : ''}
   </url>
 `;
     }

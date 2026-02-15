@@ -52,20 +52,19 @@ export function generateL1Metadata(params: {
   const cityKo = getCityNameKo(city);
   const stateDisplay = state.toUpperCase();
 
-  // Tightened title: ~55-65 chars
-  // Pattern: "{cityKo} {categoryKo} 한인업소 | HaninMap"
-  const title = `${cityKo} ${categoryNameKo} 한인업소 | ${cityDisplay} Korean ${categoryNameEn}`;
+  // Title under 60 chars: "{cityKo} 한인 {categoryKo} {count}곳 | 한인맵"
+  const title = count > 0
+    ? `${cityKo} 한인 ${categoryNameKo} ${count}곳 | 한인맵`
+    : `${cityKo} 한인 ${categoryNameKo} | 한인맵`;
 
-  // Use unique category description if available, fall back to template
+  // Description under 155 chars
   let description: string;
   if (categoryDescriptionKo && count > 0) {
-    description = `${cityKo} ${categoryDescriptionKo.slice(0, 120)} ${count}곳 등록.`;
-  } else if (categoryDescriptionEn && count > 0) {
-    description = `${cityKo} 한인 ${categoryNameKo} ${count}곳. ${categoryDescriptionEn.slice(0, 120)}`;
+    description = `${cityKo} ${categoryDescriptionKo.slice(0, 80)} ${count}곳. 전화번호, 주소, 평점.`;
   } else {
     description = count > 0
-      ? `${cityKo} 한인 ${categoryNameKo} ${count}곳. Korean ${categoryNameEn.toLowerCase()} in ${cityDisplay}, ${stateDisplay}. 전화번호, 주소, 평점, 리뷰.`
-      : `${cityKo} 한인 ${categoryNameKo}. Find Korean ${categoryNameEn.toLowerCase()} in ${cityDisplay}, ${stateDisplay}.`;
+      ? `${cityKo} 한인 ${categoryNameKo} ${count}곳. Korean ${categoryNameEn.toLowerCase()} in ${cityDisplay}, ${stateDisplay}. 전화번호, 주소, 평점.`
+      : `${cityKo} 한인 ${categoryNameKo}. Korean ${categoryNameEn.toLowerCase()} in ${cityDisplay}, ${stateDisplay}.`;
   }
 
   const slug = categorySlug || categoryNameEn.toLowerCase().replace(/\s+/g, '-');
@@ -75,7 +74,7 @@ export function generateL1Metadata(params: {
   const robots = count >= MIN_LISTINGS_FOR_INDEX ? 'index,follow' : 'noindex,follow';
 
   return {
-    title,
+    title: { absolute: title },
     description,
     robots,
     openGraph: {
@@ -107,18 +106,17 @@ export function generateL2Metadata(params: {
   const cityKo = getCityNameKo(city);
   const stateDisplay = state.toUpperCase();
 
-  const title = `${cityKo} ${subcategoryNameKo} 한인업소 | ${cityDisplay} Korean ${subcategoryNameEn}`;
+  const title = count > 0
+    ? `${cityKo} 한인 ${subcategoryNameKo} ${count}곳 | 한인맵`
+    : `${cityKo} 한인 ${subcategoryNameKo} | 한인맵`;
 
-  // Use unique subcategory description if available, fall back to template
   let description: string;
   if (subcategoryDescriptionKo && count > 0) {
-    description = `${cityKo} ${subcategoryDescriptionKo.slice(0, 120)} ${count}곳 등록.`;
-  } else if (subcategoryDescriptionEn && count > 0) {
-    description = `${cityKo} 한인 ${subcategoryNameKo} ${count}곳. ${subcategoryDescriptionEn.slice(0, 120)}`;
+    description = `${cityKo} ${subcategoryDescriptionKo.slice(0, 80)} ${count}곳. 전화번호, 주소, 평점.`;
   } else {
     description = count > 0
       ? `${cityKo} 한인 ${subcategoryNameKo} ${count}곳. Korean ${subcategoryNameEn.toLowerCase()} in ${cityDisplay}, ${stateDisplay}. 전화번호, 주소, 평점.`
-      : `${cityKo} 한인 ${subcategoryNameKo}. Find Korean ${subcategoryNameEn.toLowerCase()} in ${cityDisplay}, ${stateDisplay}.`;
+      : `${cityKo} 한인 ${subcategoryNameKo}. Korean ${subcategoryNameEn.toLowerCase()} in ${cityDisplay}, ${stateDisplay}.`;
   }
 
   const slug = subcategorySlug || subcategoryNameEn.toLowerCase().replace(/\s+/g, '-');
@@ -128,7 +126,7 @@ export function generateL2Metadata(params: {
   const robots = count >= MIN_LISTINGS_FOR_INDEX ? 'index,follow' : 'noindex,follow';
 
   return {
-    title,
+    title: { absolute: title },
     description,
     robots,
     openGraph: {
@@ -244,6 +242,24 @@ export function generateItemListSchema(
   };
 }
 
+// ─── LocalBusiness @type mapping by category ─────────────────────
+
+const CATEGORY_SCHEMA_TYPE: Record<string, string> = {
+  medical: 'MedicalBusiness',
+  dental: 'Dentist',
+  legal: 'LegalService',
+  food: 'Restaurant',
+  'real-estate': 'RealEstateAgent',
+  insurance: 'InsuranceAgency',
+  financial: 'FinancialService',
+  education: 'EducationalOrganization',
+  beauty: 'BeautySalon',
+  auto: 'AutoRepair',
+  'home-services': 'HomeAndConstructionBusiness',
+  travel: 'TravelAgency',
+  shopping: 'Store',
+};
+
 // ─── JSON-LD: LocalBusiness (enhanced) ─────────────────────────────
 
 export function generateLocalBusinessSchema(business: {
@@ -257,6 +273,7 @@ export function generateLocalBusinessSchema(business: {
   lat?: number | null;
   lng?: number | null;
   categoryNameEn: string;
+  categorySlug?: string;
   website?: string | null;
   rating?: number | null;
   reviewCount?: number | null;
@@ -266,9 +283,10 @@ export function generateLocalBusinessSchema(business: {
   openingHoursText?: string[] | null;
   addressCountry?: string;
 }) {
+  const schemaType = (business.categorySlug && CATEGORY_SCHEMA_TYPE[business.categorySlug]) || 'LocalBusiness';
   const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
-    '@type': 'LocalBusiness',
+    '@type': schemaType,
     name: business.name,
     alternateName: business.nameKo,
     address: {
