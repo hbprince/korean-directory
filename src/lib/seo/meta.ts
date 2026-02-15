@@ -77,6 +77,7 @@ export function generateL1Metadata(params: {
     title: { absolute: title },
     description,
     robots,
+    twitter: { card: 'summary' },
     openGraph: {
       title,
       description,
@@ -129,6 +130,7 @@ export function generateL2Metadata(params: {
     title: { absolute: title },
     description,
     robots,
+    twitter: { card: 'summary' },
     openGraph: {
       title,
       description,
@@ -176,6 +178,7 @@ export function generateL3Metadata(params: {
     title,
     description,
     robots,
+    twitter: { card: 'summary' },
     openGraph: {
       title,
       description,
@@ -379,9 +382,8 @@ export function buildCategoryBreadcrumbs(params: {
 
   return [
     { name: '홈 (Home)', url: BASE_URL },
-    { name: stateDisplay, url: `${BASE_URL}/regions` },
+    { name: `${stateDisplay} ${categoryNameKo}`, url: canonicalUrl(state, 'all', categorySlug) },
     { name: `${cityKo} (${cityDisplay})`, url: canonicalUrl(state, city, categorySlug) },
-    { name: `${categoryNameKo} (${categoryNameEn})`, url: canonicalUrl(state, city, categorySlug) },
   ];
 }
 
@@ -401,9 +403,8 @@ export function buildBusinessBreadcrumbs(params: {
 
   return [
     { name: '홈 (Home)', url: BASE_URL },
-    { name: stateDisplay, url: `${BASE_URL}/regions` },
+    { name: `${stateDisplay} ${categoryNameKo}`, url: canonicalUrl(state, 'all', categorySlug) },
     { name: `${cityKo} (${cityDisplay})`, url: canonicalUrl(state, city, categorySlug) },
-    { name: `${categoryNameKo} (${categoryNameEn})`, url: canonicalUrl(state, city, categorySlug) },
     { name: businessName, url: `${BASE_URL}/biz/${businessSlug}` },
   ];
 }

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import Link from 'next/link';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
+import { MobileNav } from '@/components/MobileNav';
 import { Providers } from './providers';
 import './globals.css';
 
@@ -24,6 +25,13 @@ export const metadata: Metadata = {
   description:
     'Find Korean-speaking doctors, dentists, lawyers, restaurants, and more. The most comprehensive directory of Korean businesses.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.haninmap.com'),
+  twitter: {
+    card: 'summary',
+  },
+  openGraph: {
+    siteName: '한인맵 HaninMap',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({
@@ -47,7 +55,7 @@ export default function RootLayout({
 
 function Header() {
   return (
-    <header className="border-b border-gray-200 bg-white">
+    <header className="relative border-b border-gray-200 bg-white">
       <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
         <Link href="/" className="text-2xl font-bold text-gray-900">
           한인맵
@@ -72,6 +80,7 @@ function Header() {
             알림 (Alerts)
           </Link>
         </nav>
+        <MobileNav />
       </div>
     </header>
   );
@@ -112,8 +121,10 @@ function Footer() {
             <h4 className="font-medium text-gray-900 mb-3">바로가기 (Quick Links)</h4>
             <ul className="space-y-2 text-sm">
               <li><Link href="/regions" className="text-gray-600 hover:text-gray-900">전체 지역 (All Regions)</Link></li>
+              <li><Link href="/guides" className="text-gray-600 hover:text-gray-900">가이드 (Guides)</Link></li>
               <li><Link href="/alerts" className="text-gray-600 hover:text-gray-900">생활 알림 (Alerts)</Link></li>
-              <li><Link href="/sitemap.xml" className="text-gray-600 hover:text-gray-900">Sitemap</Link></li>
+              <li><Link href="/privacy" className="text-gray-600 hover:text-gray-900">개인정보처리방침 (Privacy)</Link></li>
+              <li><Link href="/terms" className="text-gray-600 hover:text-gray-900">이용약관 (Terms)</Link></li>
             </ul>
           </div>
         </div>

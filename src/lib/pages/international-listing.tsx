@@ -98,6 +98,7 @@ export async function generateIntlMetadata(
     title,
     description,
     robots: count >= MIN_LISTINGS_FOR_INDEX ? 'index,follow' : 'noindex,follow',
+    twitter: { card: 'summary' },
     openGraph: {
       title,
       description,

@@ -48,6 +48,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       type: 'article',
       siteName: '한인맵 HaninMap',
       url: `https://www.haninmap.com/guides/${guide.slug}`,
+      publishedTime: guide.publishedAt?.toISOString(),
+      modifiedTime: guide.updatedAt.toISOString(),
+    },
+    twitter: {
+      card: 'summary',
     },
     alternates: {
       canonical: `https://www.haninmap.com/guides/${guide.slug}`,
@@ -88,6 +93,28 @@ export default async function GuidePage({ params }: PageProps) {
   ];
   const breadcrumbJsonLd = buildBreadcrumbList(breadcrumbItems);
 
+  // Article JSON-LD
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: guide.titleKo,
+    description: guide.summary,
+    datePublished: guide.publishedAt?.toISOString(),
+    dateModified: guide.updatedAt.toISOString(),
+    author: {
+      '@type': 'Organization',
+      name: '한인맵 HaninMap',
+      url: 'https://www.haninmap.com',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: '한인맵 HaninMap',
+      url: 'https://www.haninmap.com',
+    },
+    mainEntityOfPage: `https://www.haninmap.com/guides/${guide.slug}`,
+    inLanguage: 'ko',
+  };
+
   // FAQPage schema
   const faqJsonLd = faqs.length > 0 ? buildFAQPageSchema(faqs) : null;
 
@@ -113,6 +140,7 @@ export default async function GuidePage({ params }: PageProps) {
   return (
     <>
       <JsonLd data={breadcrumbJsonLd} />
+      <JsonLd data={articleJsonLd} />
       {faqJsonLd && <JsonLd data={faqJsonLd} />}
 
       <main className="max-w-4xl mx-auto px-4 py-8">
@@ -144,7 +172,14 @@ export default async function GuidePage({ params }: PageProps) {
           <div className="flex items-center gap-4 mt-4 text-sm text-gray-500">
             <span>카테고리: {categoryNameKo}</span>
             {guide.publishedAt && (
-              <span>발행일: {new Date(guide.publishedAt).toLocaleDateString('ko-KR')}</span>
+              <time dateTime={guide.publishedAt.toISOString()}>
+                발행일: {new Date(guide.publishedAt).toLocaleDateString('ko-KR')}
+              </time>
+            )}
+            {guide.updatedAt && guide.publishedAt && guide.updatedAt > guide.publishedAt && (
+              <time dateTime={guide.updatedAt.toISOString()}>
+                수정일: {new Date(guide.updatedAt).toLocaleDateString('ko-KR')}
+              </time>
             )}
           </div>
         </header>

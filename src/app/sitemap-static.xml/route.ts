@@ -10,6 +10,7 @@ export async function GET() {
     { loc: BASE_URL, lastmod: today },
     { loc: `${BASE_URL}/regions`, lastmod: today },
     { loc: `${BASE_URL}/alerts`, lastmod: today },
+    { loc: `${BASE_URL}/guides`, lastmod: today },
   ];
 
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
