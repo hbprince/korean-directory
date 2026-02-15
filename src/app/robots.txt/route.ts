@@ -3,11 +3,35 @@ import { NextResponse } from 'next/server';
 const BASE_URL = 'https://www.haninmap.com';
 
 export async function GET() {
-  const robotsTxt = `User-agent: *
+  const robotsTxt = `User-agent: GPTBot
 Allow: /
-
 Disallow: /api/
-Disallow: /*?
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /api/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /api/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /api/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /api/
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: *
+Allow: /
+Disallow: /api/
 
 Sitemap: ${BASE_URL}/sitemap.xml
 `;

@@ -2,9 +2,10 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import prisma from '@/lib/db/prisma';
 import { PRIMARY_CATEGORIES } from '@/lib/taxonomy/categories';
+import { JsonLd } from '@/components/JsonLd';
 
-// Force dynamic rendering
-export const dynamic = 'force-dynamic';
+// ISR: revalidate every hour
+export const revalidate = 3600;
 
 const BASE_URL = 'https://www.haninmap.com';
 
@@ -41,7 +42,31 @@ export default async function HomePage() {
   // Get total business count
   const totalBusinesses = await prisma.business.count();
 
+  const websiteSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: '한인맵 HaninMap',
+    alternateName: 'Korean Business Directory',
+    url: BASE_URL,
+    description: '미국, 캐나다, 호주 한인 업소 종합 디렉토리. Find Korean-speaking businesses worldwide.',
+    inLanguage: ['ko', 'en'],
+  };
+
+  const organizationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: '한인맵 HaninMap',
+    alternateName: 'Korean Business Directory 한인 업소록',
+    url: BASE_URL,
+    description: '미국, 캐나다, 호주 한인 업소를 쉽게 찾을 수 있는 종합 디렉토리',
+    areaServed: ['US', 'CA', 'AU'],
+    knowsLanguage: ['ko', 'en'],
+  };
+
   return (
+    <>
+    <JsonLd data={websiteSchema} />
+    <JsonLd data={organizationSchema} />
     <main className="max-w-6xl mx-auto px-4 py-8">
       {/* Hero Section */}
       <header className="text-center py-12">
@@ -128,6 +153,7 @@ export default async function HomePage() {
         </p>
       </section>
     </main>
+    </>
   );
 }
 

@@ -35,6 +35,7 @@ import { computeOpenNow } from '@/lib/enrichment/helpers';
 
 const ITEMS_PER_PAGE = 20;
 const BASE_URL = 'https://www.haninmap.com';
+const MIN_LISTINGS_FOR_INDEX = 3;
 
 async function getCategoryInfo(slug: string) {
   const category = await prisma.category.findUnique({
@@ -96,7 +97,7 @@ export async function generateIntlMetadata(
   return {
     title,
     description,
-    robots: 'index,follow',
+    robots: count >= MIN_LISTINGS_FOR_INDEX ? 'index,follow' : 'noindex,follow',
     openGraph: {
       title,
       description,
