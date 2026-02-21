@@ -25,7 +25,7 @@ import {
   buildCategoryBreadcrumbs,
 } from '@/lib/seo/meta';
 import { getCityNameKo, getStateNameKo, UI_LABELS } from '@/lib/i18n/labels';
-import { computeOpenNow } from '@/lib/enrichment/helpers';
+import { computeOpenNow, getTodayHours, getFirstPhotoRef } from '@/lib/enrichment/helpers';
 import { isMalformedCity } from '@/lib/seo/slug-utils';
 
 export const revalidate = 86400; // 24 hours
@@ -276,6 +276,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
           rating: true,
           userRatingsTotal: true,
           openingHoursJson: true,
+          photosJson: true,
         },
       },
       primaryCategory: true,
@@ -467,6 +468,8 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
                   trustScore={trustMap.get(String(business.id))}
                   communityMentions={mentionMap.get(String(business.id))}
                   upVotes={upVoteMap.get(String(business.id))}
+                  photoRef={process.env.GOOGLE_MAPS_API_KEY ? getFirstPhotoRef(business.googlePlace?.photosJson) : null}
+                  todayHours={getTodayHours(business.googlePlace?.openingHoursJson)}
                 />
               ))}
             </div>

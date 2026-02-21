@@ -290,27 +290,62 @@ export default async function BusinessPage({ params }: PageProps) {
         </section>
 
         {/* Map */}
-        {(googlePlace?.lat && googlePlace?.lng) || (business.lat && business.lng) ? (
-          <section className="mb-8">
-            <h2 className="text-lg font-semibold mb-4">위치 (Location)</h2>
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-              <p className="text-sm text-gray-700 mb-3">{business.addressRaw}</p>
-              <a
-                href={googlePlace?.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                  `${displayName} ${business.addressRaw}`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors text-sm text-gray-700"
-              >
-                <svg className="w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                </svg>
-                Google 지도에서 보기
-              </a>
-            </div>
-          </section>
-        ) : null}
+        {(() => {
+          const lat = googlePlace?.lat || business.lat;
+          const lng = googlePlace?.lng || business.lng;
+          const mapsUrl = googlePlace?.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+            `${displayName} ${business.addressRaw}`
+          )}`;
+
+          if (!lat || !lng) {
+            return (
+              <section className="mb-8">
+                <h2 className="text-lg font-semibold mb-4">위치 (Location)</h2>
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <p className="text-sm text-gray-700 mb-3">{business.addressRaw}</p>
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(business.addressRaw)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors text-sm text-gray-700"
+                  >
+                    🗺 Google 지도에서 보기
+                  </a>
+                </div>
+              </section>
+            );
+          }
+
+          const embedQuery = encodeURIComponent(business.addressRaw || `${lat},${lng}`);
+
+          return (
+            <section className="mb-8">
+              <h2 className="text-lg font-semibold mb-4">위치 (Location)</h2>
+              <div className="overflow-hidden rounded-lg border border-gray-200">
+                <iframe
+                  src={`https://www.google.com/maps?q=${lat},${lng}&output=embed`}
+                  width="100%"
+                  height="300"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title={`${business.nameKo} 위치 지도`}
+                />
+              </div>
+              <div className="flex items-center gap-3 mt-3">
+                <p className="text-sm text-gray-600 flex-1">{business.addressRaw}</p>
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 inline-flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                >
+                  🗺 길찾기
+                </a>
+              </div>
+            </section>
+          );
+        })()}
 
         {/* Call to Action */}
         <BusinessCTA
