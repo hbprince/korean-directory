@@ -88,6 +88,22 @@ export function computeOpenNow(openingHoursJson: unknown): boolean | null {
 }
 
 /**
+ * Get the first photo reference from photos JSON (for /api/photo proxy)
+ */
+export function getFirstPhotoRef(photosJson: unknown): string | null {
+  if (!photosJson || !Array.isArray(photosJson) || photosJson.length === 0) {
+    return null;
+  }
+  const first = (photosJson as PhotoJson[])[0];
+  if (!first?.url) return null;
+  try {
+    return new URL(first.url).searchParams.get('photoreference');
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Get the first photo URL from photos JSON
  */
 export function getFirstPhotoUrl(photosJson: unknown): string | null {

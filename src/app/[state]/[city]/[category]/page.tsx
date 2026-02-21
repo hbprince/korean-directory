@@ -25,19 +25,8 @@ import {
   buildCategoryBreadcrumbs,
 } from '@/lib/seo/meta';
 import { getCityNameKo, getStateNameKo, UI_LABELS } from '@/lib/i18n/labels';
-import { computeOpenNow, getTodayHours } from '@/lib/enrichment/helpers';
+import { computeOpenNow, getTodayHours, getFirstPhotoRef } from '@/lib/enrichment/helpers';
 import { isMalformedCity } from '@/lib/seo/slug-utils';
-
-function getFirstPhotoRef(photosJson: unknown): string | null {
-  if (!photosJson || !Array.isArray(photosJson) || photosJson.length === 0) return null;
-  const first = photosJson[0] as { url?: string };
-  if (!first?.url) return null;
-  try {
-    return new URL(first.url).searchParams.get('photoreference');
-  } catch {
-    return null;
-  }
-}
 
 export const revalidate = 86400; // 24 hours
 export const dynamicParams = true;
