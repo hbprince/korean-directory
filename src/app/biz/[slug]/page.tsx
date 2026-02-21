@@ -316,33 +316,22 @@ export default async function BusinessPage({ params }: PageProps) {
             );
           }
 
-          const apiKey = process.env.GOOGLE_MAPS_API_KEY || '';
-          const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=15&size=600x300&scale=2&markers=color:red%7C${lat},${lng}&key=${apiKey}`;
+          const embedQuery = encodeURIComponent(business.addressRaw || `${lat},${lng}`);
 
           return (
             <section className="mb-8">
               <h2 className="text-lg font-semibold mb-4">위치 (Location)</h2>
-              <a
-                href={mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block overflow-hidden rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
-              >
-                {apiKey ? (
-                  <img
-                    src={staticMapUrl}
-                    alt={`${business.nameKo} 위치 지도`}
-                    width={600}
-                    height={300}
-                    className="w-full h-auto"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="bg-gray-100 h-48 flex items-center justify-center text-gray-400 text-sm">
-                    지도를 불러올 수 없습니다
-                  </div>
-                )}
-              </a>
+              <div className="overflow-hidden rounded-lg border border-gray-200">
+                <iframe
+                  src={`https://www.google.com/maps?q=${lat},${lng}&output=embed`}
+                  width="100%"
+                  height="300"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title={`${business.nameKo} 위치 지도`}
+                />
+              </div>
               <div className="flex items-center gap-3 mt-3">
                 <p className="text-sm text-gray-600 flex-1">{business.addressRaw}</p>
                 <a
