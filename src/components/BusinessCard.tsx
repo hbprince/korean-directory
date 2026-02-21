@@ -34,7 +34,6 @@ export function BusinessCard({
   nameEn,
   addressRaw,
   city,
-  state,
   phoneRaw,
   phoneE164,
   slug,
