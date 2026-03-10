@@ -7,7 +7,7 @@ const BASE_URL = 'https://www.haninmap.com';
 
 export async function GET() {
   // Parallel queries for dynamic content
-  const [topCities, guides, topBusinesses, categories] = await Promise.all([
+  const [topCities, guides, topBusinesses, categories, allCatsRaw] = await Promise.all([
     // Top 20 city+category combos by business count
     prisma.business.groupBy({
       by: ['city', 'state', 'primaryCategoryId'],
@@ -43,15 +43,16 @@ export async function GET() {
       where: { level: 'primary' },
       select: { slug: true, nameEn: true, nameKo: true },
     }),
+    // Category ID → slug map for topCities URL building
+    prisma.category.findMany({
+      where: { level: 'primary' },
+      select: { id: true, slug: true },
+    }),
   ]);
 
   // Build category ID → slug map
   const catMap = new Map<number, string>();
-  const allCats = await prisma.category.findMany({
-    where: { id: { in: topCities.map(c => c.primaryCategoryId) } },
-    select: { id: true, slug: true },
-  });
-  allCats.forEach(c => catMap.set(c.id, c.slug));
+  allCatsRaw.forEach(c => catMap.set(c.id, c.slug));
 
   // Build popular pages section
   const popularPages = topCities

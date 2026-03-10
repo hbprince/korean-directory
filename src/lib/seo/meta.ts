@@ -292,15 +292,9 @@ const CATEGORY_SCHEMA_TYPE: Record<string, string> = {
 
 // ─── Opening Hours parser ───────────────────────────────────────────
 
-const DAY_MAP: Record<string, string> = {
-  'Monday': 'Monday',
-  'Tuesday': 'Tuesday',
-  'Wednesday': 'Wednesday',
-  'Thursday': 'Thursday',
-  'Friday': 'Friday',
-  'Saturday': 'Saturday',
-  'Sunday': 'Sunday',
-};
+const VALID_DAYS = new Set([
+  'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
+]);
 
 function parseOpeningHoursToSpec(hoursText: string[]): Array<{
   '@type': string;
@@ -320,11 +314,22 @@ function parseOpeningHoursToSpec(hoursText: string[]): Array<{
     const match = line.match(/^(\w+):\s*(.+)$/);
     if (!match) continue;
 
-    const day = DAY_MAP[match[1]];
-    if (!day) continue;
+    const day = match[1];
+    if (!VALID_DAYS.has(day)) continue;
 
     const timeStr = match[2].trim();
-    if (timeStr.toLowerCase() === 'closed' || timeStr.toLowerCase() === 'open 24 hours') continue;
+    if (timeStr.toLowerCase() === 'closed') continue;
+
+    // Handle "Open 24 hours"
+    if (timeStr.toLowerCase() === 'open 24 hours') {
+      specs.push({
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: day,
+        opens: '00:00',
+        closes: '23:59',
+      });
+      continue;
+    }
 
     // Parse time range: "9:00 AM – 5:00 PM" or "9:00 AM - 5:00 PM"
     const timeMatch = timeStr.match(/(\d{1,2}:\d{2}\s*[AP]M)\s*[–-]\s*(\d{1,2}:\d{2}\s*[AP]M)/i);
